@@ -1,0 +1,23 @@
+# NetBeans specific files
+.nb-gradle/
+nbbuild/
+nbdist/
+nbproject/private/
+build/
+dist/
+target/
+
+# NetBeans IDE user-specific files
+.idea/
+*.iml
+
+# OS specific files (macOS, Windows)
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+
+# IDE configuration files
+*.swp
+*.swo

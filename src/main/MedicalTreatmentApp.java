@@ -1,28 +1,47 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
- */
 package main;
-
 import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
-public class MedicalTreatmentApp extends Application{
-
+/**
+ * Classe principale de l'application MedicalTreatmentApp
+ * Cette classe est responsable du lancement de l'application JavaFX
+ * 
+ * @author pc
+ */
+public class MedicalTreatmentApp extends Application {
+    
+    // ============================================================
+    // =============== CONFIGURATION DE L'APPLICATION =============
+    // ============================================================
+    
     /**
-     * @param args the command line arguments
+     * Point de départ de l'application après le lancement.
+     *
+     * @param primaryStage La fenêtre principale de l'application.
+     * @throws Exception En cas d'erreur lors du chargement du fichier FXML.
      */
-    public static void main(String[] args) {
-        launch(args);
-    }
-
     @Override
-    public void start(Stage stage) throws Exception {
-        stage.setTitle("JavaFX Stage Working!");
-        stage.setScene(new Scene(new Button("Click here")));
-        stage.show();
+    public void start(Stage primaryStage) throws Exception {
+        // Charger le fichier FXML
+        Parent root = FXMLLoader.load(getClass().getResource("/view/RegisterView.fxml"));
+        
+        // Créer la scène principale
+        Scene scene = new Scene(root, 1500, 750);
+        
+        // Configurer la fenêtre principale de l'application
+        primaryStage.setTitle("MediConnect - Register");  // Définir le titre de la fenêtre
+        primaryStage.setScene(scene);                           // Attacher la scène à la fenêtre
+        primaryStage.show();                                    // Afficher la fenêtre à l'écran
     }
     
+    // ============================================================
+    // =============== POINT D'ENTRÉE DU PROGRAMME ================
+    // ============================================================
+    
+    public static void main(String[] args) {
+        launch(args);  // Lancer l'application JavaFX
+    }
 }

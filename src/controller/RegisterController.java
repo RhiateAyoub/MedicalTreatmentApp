@@ -20,6 +20,7 @@ import java.sql.SQLException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import javafx.scene.control.CheckBox;
 
 import utils.AlertMessage;
 import utils.Database;
@@ -45,6 +46,12 @@ public class RegisterController {
     // --- Actions principales
     @FXML private Button registerButton;
     @FXML private Hyperlink loginLink;
+    
+    
+    @FXML private TextField visiblePasswordField;
+    @FXML private CheckBox showPasswordCheckBox;
+
+
     
     // ============================================================
     // ============== ATTRIBUTS ET STRUCTURES DE DONNÉES ==========
@@ -85,8 +92,8 @@ public class RegisterController {
         
         connect = Database.connectDB();
         
-        String checkUsernameSQL = "SELECT * FROM utilisateur WHERE username = ?";
-        String insertSQL = "INSERT INTO utilisateur (username, password, role) VALUES (?, ?, ?)";
+        String checkUsernameSQL = "SELECT * FROM utilisateur WHERE nom_utilisateur = ?";
+        String insertSQL = "INSERT INTO utilisateur (nom_utilisateur, mot_de_passe, role) VALUES (?, ?, ?)";
         
         try {
             prepare = connect.prepareStatement(checkUsernameSQL);
@@ -100,7 +107,7 @@ public class RegisterController {
             
             prepare = connect.prepareStatement(insertSQL);
             prepare.setString(1, username);
-            prepare.setString(2, password); // 🔒 Hachage recommandé pour la production
+            prepare.setString(2, password);
             prepare.setString(3, selectedSpecialty);
             
             int rowsInserted = prepare.executeUpdate();
@@ -176,4 +183,25 @@ public class RegisterController {
         confirmPasswordField.clear();
         specialtyComboBox.setValue(null);
     }
+    @FXML
+private void togglePasswordVisibility() {
+    boolean show = showPasswordCheckBox.isSelected();
+
+    if (show) {
+        visiblePasswordField.setText(passwordField.getText());
+        visiblePasswordField.setVisible(true);
+        visiblePasswordField.setManaged(true);
+        passwordField.setVisible(false);
+        passwordField.setManaged(false);
+    } else {
+        passwordField.setText(visiblePasswordField.getText());
+        passwordField.setVisible(true);
+        passwordField.setManaged(true);
+        visiblePasswordField.setVisible(false);
+        visiblePasswordField.setManaged(false);
+    }
 }
+
+}
+//visible Passworld
+

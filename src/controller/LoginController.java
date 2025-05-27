@@ -39,6 +39,11 @@ public class LoginController {
     @FXML private PasswordField passwordField;
     @FXML private CheckBox ShowPasswordCheckbox;
 
+    @FXML
+    private TextField visiblePasswordField;
+
+
+
     // --- Actions principales
     @FXML private Button loginButton;
     @FXML private Hyperlink registerLink;
@@ -109,4 +114,21 @@ public class LoginController {
     private boolean isValidLogin(String username, String password) {
         return username != null && !username.isEmpty() && password != null && !password.isEmpty();
     }
+    @FXML
+    private void togglePasswordVisibility() {
+        if (ShowPasswordCheckbox.isSelected()) {
+            visiblePasswordField.setText(passwordField.getText());
+            visiblePasswordField.setVisible(true);
+            visiblePasswordField.setManaged(true);
+            passwordField.setVisible(false);
+            passwordField.setManaged(false);
+        } else {
+            passwordField.setText(visiblePasswordField.getText());
+            passwordField.setVisible(true);
+            passwordField.setManaged(true);
+            visiblePasswordField.setVisible(false);
+            visiblePasswordField.setManaged(false);
+        }
+    }
+
 }

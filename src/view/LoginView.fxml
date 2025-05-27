@@ -11,6 +11,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.control.CheckBox?>
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.LoginController">
    <left>
@@ -135,12 +136,15 @@
                         <Insets bottom="5.0" />
                      </VBox.margin>
                   </Label>
-                  <PasswordField fx:id="passwordField" prefHeight="40.0" promptText="Entrez votre mot de passe">
-                     <VBox.margin>
-                        <Insets bottom="15.0" />
-                     </VBox.margin>
-                  </PasswordField>
-                  <CheckBox fx:id="ShowPasswordCheckbox" mnemonicParsing="false" text="Show password">
+                  <!-- Password masqué -->
+                  <PasswordField fx:id="passwordField" prefHeight="40.0" promptText="Entrez votre mot de passe" />
+
+                  <!-- Password visible -->
+                  <TextField fx:id="visiblePasswordField" prefHeight="40.0" promptText="Entrez votre mot de passe"
+                             visible="false" managed="false" />
+
+                  <!-- Checkbox -->
+                  <CheckBox fx:id="ShowPasswordCheckbox" mnemonicParsing="false" text="Afficher le mot de passe" onAction="#togglePasswordVisibility">
                      <VBox.margin>
                         <Insets bottom="20.0" />
                      </VBox.margin>

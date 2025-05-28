@@ -30,7 +30,7 @@
                     <Insets bottom="5.0" top="15.0" />
                 </VBox.margin>
             </Label>
-            <Button fx:id="btnAccueil" onAction="#handleAccueilClick" prefWidth="200.0" style="-fx-text-fill: black; -fx-background-color: #f0f0f0; -fx-alignment: CENTER-LEFT;" styleClass="menu-button" text="Accueil">
+            <Button fx:id="btnAccueil" onAction="#handleAccueilClick" prefWidth="200.0" maxWidth="Infinity" HBox.hgrow="ALWAYS" style="-fx-text-fill: black; -fx-background-color: #f0f0f0; -fx-alignment: CENTER-LEFT;" styleClass="menu-button" text="Accueil">
                 <graphic>
                     <ImageView fitHeight="16" fitWidth="16" preserveRatio="true">
                         <Image url="@../resources/icons/Home.png" />
@@ -40,7 +40,7 @@
                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                 </padding>
             </Button>
-            <Button fx:id="btnPatients" onAction="#handlePatientsClick" prefWidth="200.0" style="-fx-text-fill: black; -fx-background-color: white; -fx-alignment: CENTER-LEFT;" styleClass="menu-button-active" text="Patients">
+            <Button fx:id="btnPatients" onAction="#handlePatientsClick" prefWidth="200.0" maxWidth="Infinity" HBox.hgrow="ALWAYS" style="-fx-text-fill: black; -fx-background-color: white; -fx-alignment: CENTER-LEFT;" styleClass="menu-button-active" text="Patients">
                 <graphic>
                     <ImageView fitHeight="16" fitWidth="16" preserveRatio="true">
                         <Image url="@../resources/icons/Users.png" />
@@ -50,7 +50,7 @@
                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                 </padding>
             </Button>
-            <Button fx:id="btnTraitements" onAction="#handleTraitementsClick" prefWidth="200.0" style="-fx-text-fill: black; -fx-background-color: white; -fx-alignment: CENTER-LEFT;" styleClass="menu-button" text="Traitements">
+            <Button fx:id="btnTraitements" onAction="#handleTraitementsClick" prefWidth="200.0"  style="-fx-text-fill: black; -fx-background-color: white; -fx-alignment: CENTER-LEFT;" styleClass="menu-button" text="Traitements">
                 <graphic>
                     <ImageView fitHeight="16" fitWidth="16" preserveRatio="true">
                         <Image url="@../resources/icons/List.png" />
@@ -110,10 +110,12 @@
    
    <!-- Contenu principal -->
    <center>
-      <AnchorPane prefHeight="600.0" prefWidth="740.0" BorderPane.alignment="CENTER">
-         <children>
-            <VBox prefHeight="600.0" prefWidth="740.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-               <children>
+      <!--<AnchorPane prefHeight="600.0" prefWidth="740.0" BorderPane.alignment="CENTER">-->
+       <AnchorPane BorderPane.alignment="CENTER" AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
+       <children>
+            <!--<VBox prefHeight="600.0" prefWidth="740.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">-->
+           <VBox AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" VBox.vgrow="ALWAYS" style="-fx-background-color: white;">
+           <children>
                   <HBox alignment="CENTER_LEFT" style="-fx-background-color: white; -fx-border-color: #E0E0E0; -fx-border-width: 0 0 1px 0;">
                     <padding>
                         <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
@@ -175,10 +177,10 @@
                                     </graphic>
                                  </Button>
                               </VBox>
-                              
+
                               <!-- Espacement -->
                               <Region prefWidth="20.0" />
-                              
+
                               <!-- Deuxième bouton et sa colonne -->
                               <VBox prefWidth="216.0">
                                  <Button fx:id="btnAjouterTraitement" mnemonicParsing="false" onAction="#handleAjouterTraitementClick" prefHeight="40.0" prefWidth="216.0" style="-fx-background-color: #333333; -fx-text-fill: white; -fx-background-radius: 4;" text="Ajouter traitement">
@@ -191,10 +193,10 @@
                                     </graphic>
                                  </Button>
                               </VBox>
-                              
+
                               <!-- Espacement -->
                               <Region prefWidth="20.0" />
-                              
+
                               <!-- Troisième bouton et sa colonne -->
                               <VBox prefWidth="216.0">
                                  <Button fx:id="btnPlanifierRendezVous" mnemonicParsing="false" onAction="#handlePlanifierRendezVousClick" prefHeight="40.0" prefWidth="216.0" style="-fx-background-color: #333333; -fx-text-fill: white; -fx-background-radius: 4;" text="Planifier Rendez-vous">
@@ -208,7 +210,7 @@
                                  </Button>
                               </VBox>
                            </HBox>
-                           
+
                            <!-- Conteneur pour les statistiques -->
                            <HBox>
                               <VBox alignment="CENTER" prefHeight="100.0" prefWidth="216.0" style="-fx-border-color: #e0e0e0; -fx-border-radius: 4;">

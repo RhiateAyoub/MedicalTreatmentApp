@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package controller;
 
 import javafx.beans.property.BooleanProperty;
@@ -31,6 +27,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 
 import model.Patient;
 import utils.AlertMessage;
@@ -40,7 +37,7 @@ import utils.SceneManager;
 /**
  * Contrôleur pour la gestion des patients dans l'application MediConnect.
  * Permet de créer, lire, mettre à jour et supprimer les données patients.
- * 
+ *
  * @author pc
  */
 
@@ -51,96 +48,56 @@ public class PatientController {
     // ============================================================
 
     // --- Navigation
-    @FXML
-    private Button btnAccueil;
-    @FXML
-    private Button btnPatients;
-    @FXML
-    private Button btnTraitements;
-    @FXML
-    private Button btnRendezVous;
-    @FXML
-    private Button btnStatistiques;
-    @FXML
-    private Button btnParametres;
-    @FXML
-    private Button btnAide;
+    @FXML private Button btnAccueil;
+    @FXML private Button btnPatients;
+    @FXML private Button btnTraitements;
+    @FXML private Button btnRendezVous;
+    @FXML private Button btnStatistiques;
+    @FXML private Button btnParametres;
+    @FXML private Button btnAide;
 
     // --- Actions principales
-    @FXML
-    private Button btnExporter;
-    @FXML
-    private Button btnAjouterPatient;
-    @FXML
-    private Button btnSupprimerPatients;
+    @FXML private Button btnExporter;
+    @FXML private Button btnAjouterPatient;
+    @FXML private Button btnSupprimerPatients;
 
     // --- Organisation des vues
-    @FXML
-    private VBox patientsListView;
-    @FXML
-    private VBox patientsAddView;
-    @FXML
-    private VBox patientsEditView;
+    @FXML private VBox patientsListView;
+    @FXML private VBox patientsAddView;
+    @FXML private VBox patientsEditView;
 
     // --- Tableau de patients
-    @FXML
-    private TableView<Patient> tablePatients;
-    @FXML
-    private TableColumn<Patient, Boolean> checkboxColumn;
-    @FXML
-    private TableColumn<Patient, String> nomColumn;
-    @FXML
-    private TableColumn<Patient, String> prenomColumn;
-    @FXML
-    private TableColumn<Patient, String> dateNaissanceColumn;
-    @FXML
-    private TableColumn<Patient, String> sexeColumn;
-    @FXML
-    private TableColumn<Patient, Void> actionsColumn;
+    @FXML private TableView<Patient> tablePatients;
+    @FXML private TableColumn<Patient, Boolean> checkboxColumn;
+    @FXML private TableColumn<Patient, String> nomColumn;
+    @FXML private TableColumn<Patient, String> prenomColumn;
+    @FXML private TableColumn<Patient, String> dateNaissanceColumn;
+    @FXML private TableColumn<Patient, String> sexeColumn;
+    @FXML private TableColumn<Patient, Void> actionsColumn;
 
     // --- Bar de recherche
-    @FXML
-    private TextField searchField;
+    @FXML private TextField searchField;
 
     // --- Select all checkbox
-    @FXML
-    private CheckBox selectAllCheckbox;
+    @FXML private CheckBox selectAllCheckbox;
 
     // --- Formulaire d'ajout
-    @FXML
-    private TextField inputId;
-    @FXML
-    private TextField inputNom;
-    @FXML
-    private TextField inputPrenom;
-    @FXML
-    private TextField inputSecuriteSociale;
-    @FXML
-    private TextField inputTelephone;
-    @FXML
-    private TextField inputDateNaissance;
-    @FXML
-    private RadioButton radioHomme;
-    @FXML
-    private RadioButton radioFemme;
+    @FXML private TextField inputNom;
+    @FXML private TextField inputPrenom;
+    @FXML private TextField inputSecuriteSociale;
+    @FXML private TextField inputTelephone;
+    @FXML private TextField inputDateNaissance;
+    @FXML private RadioButton radioHomme;
+    @FXML private RadioButton radioFemme;
 
     // --- Formulaire d'édition
-    @FXML
-    private TextField editId;
-    @FXML
-    private TextField editNom;
-    @FXML
-    private TextField editPrenom;
-    @FXML
-    private TextField editSecuriteSociale;
-    @FXML
-    private TextField editTelephone;
-    @FXML
-    private TextField editDateNaissance;
-    @FXML
-    private RadioButton editRadioHomme;
-    @FXML
-    private RadioButton editRadioFemme;
+    @FXML private TextField editNom;
+    @FXML private TextField editPrenom;
+    @FXML private TextField editSecuriteSociale;
+    @FXML private TextField editTelephone;
+    @FXML private TextField editDateNaissance;
+    @FXML private RadioButton editRadioHomme;
+    @FXML private RadioButton editRadioFemme;
 
     // ============================================================
     // ============== ATTRIBUTS ET STRUCTURES DE DONNÉES ==========
@@ -301,13 +258,12 @@ public class PatientController {
 
     // Methode pour supprimer les patients de la DB
     private void supprimerPatientDeDB(Patient patient) {
-        String sql = "DELETE FROM patient WHERE nom = ? AND prenom = ?";
+        String sql = "DELETE FROM patient WHERE id = ?";
 
         try (Connection connect = Database.connectDB();
              PreparedStatement pstmt = connect.prepareStatement(sql)) {
 
-            pstmt.setString(1, patient.getNom());
-            pstmt.setString(2, patient.getPrenom());
+            pstmt.setInt(1, patient.getId());
 
             pstmt.executeUpdate();
 
@@ -334,9 +290,10 @@ public class PatientController {
         String secu = inputSecuriteSociale.getText().trim();
         String sexe = radioHomme.isSelected() ? "Homme" : (radioFemme.isSelected() ? "Femme" : "");
 
-        Patient newPatient = new Patient(nom, prenom, dateNaissance, sexe);
+        Patient newPatient = new Patient(nom, prenom, dateNaissance, sexe, tele, secu);
         patients.add(newPatient);
-        ajouterPatientDansDB(newPatient, tele, secu);
+        ajouterPatientDansDB(newPatient);
+
         patientsListView.setVisible(true);
         patientsAddView.setVisible(false);
 
@@ -354,22 +311,22 @@ public class PatientController {
         patientsAddView.setVisible(false);
     }
 
-    private void ajouterPatientDansDB(Patient patient, String tele, String secu) {
+    private void ajouterPatientDansDB(Patient patient) {
 
         String checkSecuSQL = "SELECT * FROM patient WHERE numero_securite_sociale = ?";
-        String insertSQL = "INSERT INTO patient (nom, prenom, date_naissance, sexe, numero_telephone, numero_securite_sociale) VALUES (?, ?, ?, ?, ?, ?)";
+        String insertSQL = "INSERT INTO patient (nom, prenom, date_naissance, sexe, numero_telephone, numero_securite_sociale, date_creation) VALUES (?, ?, ?, ?, ?, ?, datetime('now'))";
 
         try (Connection connect = Database.connectDB();
              PreparedStatement checkStmt = connect.prepareStatement(checkSecuSQL);
-             PreparedStatement insertStmt = connect.prepareStatement(insertSQL)) {
+             PreparedStatement insertStmt = connect.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS)) {
 
-            checkStmt.setString(1, secu);
+            checkStmt.setString(1, patient.getNumSecuriteSociale());
             ResultSet result = checkStmt.executeQuery();
             if (result.next()) {
                 AlertMessage.showErrorAlert(
                         "Erreur",
                         "Patient déjà existant",
-                        secu + " existe déjà !");
+                        patient.getNumSecuriteSociale() + " existe déjà !");
                 return;
             }
 
@@ -377,10 +334,31 @@ public class PatientController {
             insertStmt.setString(2, patient.getPrenom());
             insertStmt.setString(3, patient.getDateNaissance());
             insertStmt.setString(4, patient.getSexe());
-            insertStmt.setString(5, tele);
-            insertStmt.setString(6, secu);
+            insertStmt.setString(5, patient.getNumTelephone());
+            insertStmt.setString(6, patient.getNumSecuriteSociale());
 
             insertStmt.executeUpdate();
+
+            // Récupérer l'ID généré
+            try (ResultSet generatedKeys = insertStmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    int generatedId = generatedKeys.getInt(1); // Obtenir l'ID généré
+                    patient.setId(generatedId); // L'assigner à l'objet Patient
+                } else {
+                    throw new SQLException("Création du patient échouée, aucun ID obtenu.");
+                }
+            }
+
+            // Récupérer la date de création généré
+            String selectSQL = "SELECT date_creation FROM patient WHERE id = ?";
+            try (PreparedStatement selectStmt = connect.prepareStatement(selectSQL)) {
+                selectStmt.setInt(1, patient.getId());
+                ResultSet selectResult = selectStmt.executeQuery();
+                if (selectResult.next()) {
+                    String dateCreation = selectResult.getString("date_creation");
+                    patient.setDateCreation(dateCreation);
+                }
+            }
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -399,13 +377,18 @@ public class PatientController {
         if (!validatePatientInputs(editNom, editPrenom, editDateNaissance)) {
             return;
         }
-        /*patientToEdit.setId(editId.getText().trim()); */
+
         patientToEdit.setNom(editNom.getText().trim());
         patientToEdit.setPrenom(editPrenom.getText().trim());
         patientToEdit.setDateNaissance(editDateNaissance.getText().trim());
+        patientToEdit.setNumTelephone(editTelephone.getText().trim());
+        patientToEdit.setNumSecuriteSociale(editSecuriteSociale.getText().trim());
         patientToEdit.setSexe(editRadioHomme.isSelected() ? "Homme" : (editRadioFemme.isSelected() ? "Femme" : ""));
-        //updatePatientInDatabase(patientToEdit);
+
+        modifierPatientDansDB(patientToEdit);
+
         tablePatients.refresh();
+
         patientsListView.setVisible(true);
         patientsEditView.setVisible(false);
 
@@ -422,6 +405,31 @@ public class PatientController {
         patientsEditView.setVisible(false);
     }
 
+    private void modifierPatientDansDB(Patient patient) {
+        String updateSQL = "UPDATE patient SET nom = ?, prenom = ?, date_naissance = ?, sexe = ?, numero_telephone = ?, numero_securite_sociale = ? WHERE id = ?";
+
+        try (Connection connect = Database.connectDB();
+             PreparedStatement updateStmt = connect.prepareStatement(updateSQL)) {
+
+            updateStmt.setString(1, patient.getNom());
+            updateStmt.setString(2, patient.getPrenom());
+            updateStmt.setString(3, patient.getDateNaissance());
+            updateStmt.setString(4, patient.getSexe());
+            updateStmt.setString(5, patient.getNumTelephone());
+            updateStmt.setString(6, patient.getNumSecuriteSociale());
+            updateStmt.setInt(7, patient.getId());
+
+            updateStmt.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            AlertMessage.showErrorAlert(
+                    "Erreur",
+                    "Erreur BDD : ",
+                    e.getMessage());
+        }
+    }
+
     // ============================================================
     // =================== MÉTHODES AUXILIAIRES ===================
     // ============================================================
@@ -430,19 +438,23 @@ public class PatientController {
         patients.clear();
         String url = "jdbc:sqlite:src/utils/MedicalTreatmentApp_DB.db";
 
-        String query = "SELECT nom, prenom, date_naissance, sexe FROM patient";
+        String query = "SELECT id, nom, prenom, date_naissance, sexe, numero_telephone, numero_securite_sociale, date_creation FROM patient";
 
         try (Connection connect = DriverManager.getConnection(url);
              PreparedStatement prepare = connect.prepareStatement(query);
-             ResultSet result = prepare.executeQuery();) {
+             ResultSet result = prepare.executeQuery();){
 
             while (result.next()) {
+                int id = result.getInt("id");
                 String nom = result.getString("nom");
                 String prenom = result.getString("prenom");
                 String dateNaissance = result.getString("date_naissance");
                 String sexe = result.getString("sexe");
+                String numTelephone = result.getString("numero_telephone");
+                String numSecuriteSociale = result.getString("numero_securite_sociale");
+                String dateCreation = result.getString("date_creation");
 
-                patients.add(new Patient(nom, prenom, dateNaissance, sexe));
+                patients.add(new Patient(id, nom, prenom, dateNaissance, sexe, numTelephone, numSecuriteSociale, dateCreation));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -518,7 +530,7 @@ public class PatientController {
                         btnView.setOnAction((ActionEvent event) -> {
                             Patient patient = getTableView().getItems().get(getIndex());
                             System.out.println("Voir les détails de " + patient.getNom());
-                            // TODO: Implémenter la vue détaillée
+                            showPatientDetails(patient);
                         });
 
                         btnEdit.setOnAction((ActionEvent event) -> {
@@ -528,6 +540,7 @@ public class PatientController {
 
                         btnDelete.setOnAction((ActionEvent event) -> {
                             Patient patient = getTableView().getItems().get(getIndex());
+                            System.out.println("When clicking on edit:" + patient.getId());
                             deletePatient(patient);
                         });
                     }
@@ -570,6 +583,28 @@ public class PatientController {
         return btn;
     }
 
+    private void showPatientDetails(Patient patient) {
+        // Create a message to show in the alert, combining the patient details
+        String patientDetails = String.format(
+                "Nom: %s\nPrénom: %s\nDate de Naissance: %s\nSexe: %s\nNuméro de Téléphone: %s\n" +
+                        "Numéro de Sécurité Sociale: %s\nDate de Création: %s",
+                patient.getNom(),
+                patient.getPrenom(),
+                patient.getDateNaissance(),
+                patient.getSexe(),
+                patient.getNumTelephone(),
+                patient.getNumSecuriteSociale(),
+                patient.getDateCreation()
+        );
+
+        // Create an Alert to display the details
+        AlertMessage.showInfoAlert(
+                "Détails du Patient",
+                "Informations complètes du patient",
+                patientDetails
+        );
+    }
+
     // ---- Gestion du formulaire d'ajout ----
     private void resetAddPatientForm() {
         inputNom.clear();
@@ -588,6 +623,8 @@ public class PatientController {
 
         editNom.setText(patient.getNom());
         editPrenom.setText(patient.getPrenom());
+        editSecuriteSociale.setText(patient.getNumSecuriteSociale());
+        editTelephone.setText(patient.getNumTelephone());
         editDateNaissance.setText(patient.getDateNaissance());
 
         if ("Homme".equals(patient.getSexe())) {
@@ -611,6 +648,7 @@ public class PatientController {
 
         if (confirmed) {
             patients.remove(patient);
+            supprimerPatientDeDB(patient);
             AlertMessage.showInfoAlert(
                     "Succès",
                     "Suppression réussie",
@@ -634,10 +672,10 @@ public class PatientController {
         if (dateNaissance.getText().trim().isEmpty()) {
             errorMessage.append("- La date de naissance est obligatoire\n");
         } else {
-            // Validation du format de date (JJ/MM/AAAA)
-            String datePattern = "^(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[0-2])/\\d{4}$";
+            // Validation du format de date (AAAA-MM-JJ)
+            String datePattern = "^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$";
             if (!dateNaissance.getText().trim().matches(datePattern)) {
-                errorMessage.append("- Format de date invalide (JJ/MM/AAAA)\n");
+                errorMessage.append("- Format de date invalide (AAAA-MM-JJ)\n");
             }
         }
 

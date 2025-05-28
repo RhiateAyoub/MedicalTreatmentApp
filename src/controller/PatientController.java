@@ -45,75 +45,115 @@ import utils.SceneManager;
  */
 
 public class PatientController {
-    
+
     // ============================================================
     // ================ COMPOSANTS INTERFACE FXML ================
     // ============================================================
-    
+
     // --- Navigation
-    @FXML private Button btnAccueil;
-    @FXML private Button btnPatients;
-    @FXML private Button btnTraitements;
-    @FXML private Button btnRendezVous;
-    @FXML private Button btnStatistiques;
-    @FXML private Button btnParametres;
-    @FXML private Button btnAide;
-    
+    @FXML
+    private Button btnAccueil;
+    @FXML
+    private Button btnPatients;
+    @FXML
+    private Button btnTraitements;
+    @FXML
+    private Button btnRendezVous;
+    @FXML
+    private Button btnStatistiques;
+    @FXML
+    private Button btnParametres;
+    @FXML
+    private Button btnAide;
+
     // --- Actions principales
-    @FXML private Button btnExporter;
-    @FXML private Button btnAjouterPatient;
-    @FXML private Button btnSupprimerPatients;
+    @FXML
+    private Button btnExporter;
+    @FXML
+    private Button btnAjouterPatient;
+    @FXML
+    private Button btnSupprimerPatients;
 
     // --- Organisation des vues
-    @FXML private VBox patientsListView;
-    @FXML private VBox patientsAddView;
-    @FXML private VBox patientsEditView;
+    @FXML
+    private VBox patientsListView;
+    @FXML
+    private VBox patientsAddView;
+    @FXML
+    private VBox patientsEditView;
 
     // --- Tableau de patients
-    @FXML private TableView<Patient> tablePatients;
-    @FXML private TableColumn<Patient, Boolean> checkboxColumn;
-    @FXML private TableColumn<Patient, String> nomColumn;
-    @FXML private TableColumn<Patient, String> prenomColumn;
-    @FXML private TableColumn<Patient, String> dateNaissanceColumn;
-    @FXML private TableColumn<Patient, String> sexeColumn;
-    @FXML private TableColumn<Patient, Void> actionsColumn;
+    @FXML
+    private TableView<Patient> tablePatients;
+    @FXML
+    private TableColumn<Patient, Boolean> checkboxColumn;
+    @FXML
+    private TableColumn<Patient, String> nomColumn;
+    @FXML
+    private TableColumn<Patient, String> prenomColumn;
+    @FXML
+    private TableColumn<Patient, String> dateNaissanceColumn;
+    @FXML
+    private TableColumn<Patient, String> sexeColumn;
+    @FXML
+    private TableColumn<Patient, Void> actionsColumn;
 
     // --- Bar de recherche
-    @FXML private TextField searchField;
-    
+    @FXML
+    private TextField searchField;
+
     // --- Select all checkbox
-    @FXML private CheckBox selectAllCheckbox;
+    @FXML
+    private CheckBox selectAllCheckbox;
 
     // --- Formulaire d'ajout
-    @FXML private TextField inputNom;
-    @FXML private TextField inputPrenom;
-    @FXML private TextField inputSecuriteSociale;
-    @FXML private TextField inputTelephone;
-    @FXML private TextField inputDateNaissance;
-    @FXML private RadioButton radioHomme;
-    @FXML private RadioButton radioFemme;
+    @FXML
+    private TextField inputId;
+    @FXML
+    private TextField inputNom;
+    @FXML
+    private TextField inputPrenom;
+    @FXML
+    private TextField inputSecuriteSociale;
+    @FXML
+    private TextField inputTelephone;
+    @FXML
+    private TextField inputDateNaissance;
+    @FXML
+    private RadioButton radioHomme;
+    @FXML
+    private RadioButton radioFemme;
 
     // --- Formulaire d'édition
-    @FXML private TextField editNom;
-    @FXML private TextField editPrenom;
-    @FXML private TextField editSecuriteSociale;
-    @FXML private TextField editTelephone;
-    @FXML private TextField editDateNaissance;
-    @FXML private RadioButton editRadioHomme;
-    @FXML private RadioButton editRadioFemme;
+    @FXML
+    private TextField editId;
+    @FXML
+    private TextField editNom;
+    @FXML
+    private TextField editPrenom;
+    @FXML
+    private TextField editSecuriteSociale;
+    @FXML
+    private TextField editTelephone;
+    @FXML
+    private TextField editDateNaissance;
+    @FXML
+    private RadioButton editRadioHomme;
+    @FXML
+    private RadioButton editRadioFemme;
 
     // ============================================================
     // ============== ATTRIBUTS ET STRUCTURES DE DONNÉES ==========
     // ============================================================
     // --- Propriété booléenne indiquant si au moins un patient est actuellement sélectionné.
     private BooleanProperty anyPatientSelected = new SimpleBooleanProperty(false);
-    
+
     // --- Référence au patient sélectionné pour une opération de modification.
     private Patient patientToEdit;
-    
+
     // --- List contenant les patients
     private ObservableList<Patient> patients = FXCollections.observableArrayList();
-    
+
     // --- List contenant les patients correspondant à la recherche.
     private FilteredList<Patient> filteredPatients;
 
@@ -126,7 +166,7 @@ public class PatientController {
         patientsListView.setVisible(true);
         patientsAddView.setVisible(false);
         patientsEditView.setVisible(false);
-        
+
         // Charge les patients depuis la base de données
         loadPatientsFromDatabase();
 
@@ -148,7 +188,7 @@ public class PatientController {
             updateDeleteButtonState();
         });
     }
-    
+
     // =============================================================================
     // ============== ACTIONS SUR LE MENU LATÉRAL (Navigation entre les vues) ======
     // =============================================================================
@@ -196,7 +236,7 @@ public class PatientController {
     // ============================================================
     // ========== ACTIONS SUR LA VUE PRINCIPALE ===================
     // ============================================================
-    
+
     // --- Gestion de select all
     @FXML
     public void handleSelectAllCheckbox() {
@@ -217,7 +257,7 @@ public class PatientController {
         patientsAddView.setVisible(true);
         patientsEditView.setVisible(false);
     }
-    
+
     // --- GESTION DE LA SUPPRESSION (événements @FXML) ========
     @FXML
     public void handleDeletePatients() {
@@ -231,9 +271,9 @@ public class PatientController {
 
         if (!patientsToRemove.isEmpty()) {
             boolean confirmed = AlertMessage.showConfirmationAlert(
-                "Confirmation", 
-                "Suppression de patient(s)", 
-                "Êtes-vous sûr de vouloir supprimer " + patientsToRemove.size() + " patient(s) ?"
+                    "Confirmation",
+                    "Suppression de patient(s)",
+                    "Êtes-vous sûr de vouloir supprimer " + patientsToRemove.size() + " patient(s) ?"
             );
 
             if (confirmed) {
@@ -243,22 +283,22 @@ public class PatientController {
                 patients.removeAll(patientsToRemove);
                 selectAllCheckbox.setSelected(false);
                 updateDeleteButtonState();
-                
+
                 AlertMessage.showInfoAlert(
-                    "Succès", 
-                    "Suppression réussie", 
-                    "Patient(s) supprimé(s) avec succès !"
+                        "Succès",
+                        "Suppression réussie",
+                        "Patient(s) supprimé(s) avec succès !"
                 );
             }
         } else {
             AlertMessage.showErrorAlert(
-                "Erreur", 
-                "Aucune sélection", 
-                "Aucun patient sélectionné."
+                    "Erreur",
+                    "Aucune sélection",
+                    "Aucun patient sélectionné."
             );
         }
     }
-    
+
     // Methode pour supprimer les patients de la DB
     private void supprimerPatientDeDB(Patient patient) {
         String sql = "DELETE FROM patient WHERE nom = ? AND prenom = ?";
@@ -297,14 +337,13 @@ public class PatientController {
         Patient newPatient = new Patient(nom, prenom, dateNaissance, sexe);
         patients.add(newPatient);
         ajouterPatientDansDB(newPatient, tele, secu);
-
         patientsListView.setVisible(true);
         patientsAddView.setVisible(false);
 
         AlertMessage.showInfoAlert(
-            "Succès", 
-            "Ajout réussi", 
-            "Patient ajouté avec succès !"
+                "Succès",
+                "Ajout réussi",
+                "Patient ajouté avec succès !"
         );
     }
 
@@ -314,11 +353,11 @@ public class PatientController {
         patientsListView.setVisible(true);
         patientsAddView.setVisible(false);
     }
-    
+
     private void ajouterPatientDansDB(Patient patient, String tele, String secu) {
 
-       String checkSecuSQL = "SELECT * FROM patient WHERE numero_securite_sociale = ?";
-       String insertSQL = "INSERT INTO patient (nom, prenom, date_naissance, sexe, numero_telephone, numero_securite_sociale) VALUES (?, ?, ?, ?, ?, ?)";
+        String checkSecuSQL = "SELECT * FROM patient WHERE numero_securite_sociale = ?";
+        String insertSQL = "INSERT INTO patient (nom, prenom, date_naissance, sexe, numero_telephone, numero_securite_sociale) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection connect = Database.connectDB();
              PreparedStatement checkStmt = connect.prepareStatement(checkSecuSQL);
@@ -328,9 +367,9 @@ public class PatientController {
             ResultSet result = checkStmt.executeQuery();
             if (result.next()) {
                 AlertMessage.showErrorAlert(
-                "Erreur", 
-                "Patient déjà existant", 
-                secu + " existe déjà !");
+                        "Erreur",
+                        "Patient déjà existant",
+                        secu + " existe déjà !");
                 return;
             }
 
@@ -346,9 +385,9 @@ public class PatientController {
         } catch (SQLException e) {
             e.printStackTrace();
             AlertMessage.showErrorAlert(
-            "Erreur", 
-            "Erreur BDD : ", 
-            e.getMessage());
+                    "Erreur",
+                    "Erreur BDD : ",
+                    e.getMessage());
         }
     }
 
@@ -360,21 +399,20 @@ public class PatientController {
         if (!validatePatientInputs(editNom, editPrenom, editDateNaissance)) {
             return;
         }
-
+        /*patientToEdit.setId(editId.getText().trim()); */
         patientToEdit.setNom(editNom.getText().trim());
         patientToEdit.setPrenom(editPrenom.getText().trim());
         patientToEdit.setDateNaissance(editDateNaissance.getText().trim());
         patientToEdit.setSexe(editRadioHomme.isSelected() ? "Homme" : (editRadioFemme.isSelected() ? "Femme" : ""));
-
+        //updatePatientInDatabase(patientToEdit);
         tablePatients.refresh();
-
         patientsListView.setVisible(true);
         patientsEditView.setVisible(false);
 
         AlertMessage.showInfoAlert(
-            "Succès", 
-            "Modification réussie", 
-            "Patient modifié avec succès !"
+                "Succès",
+                "Modification réussie",
+                "Patient modifié avec succès !"
         );
     }
 
@@ -396,8 +434,8 @@ public class PatientController {
 
         try (Connection connect = DriverManager.getConnection(url);
              PreparedStatement prepare = connect.prepareStatement(query);
-             ResultSet result = prepare.executeQuery();){
-            
+             ResultSet result = prepare.executeQuery();) {
+
             while (result.next()) {
                 String nom = result.getString("nom");
                 String prenom = result.getString("prenom");
@@ -408,8 +446,8 @@ public class PatientController {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            AlertMessage.showErrorAlert("Erreur", "Erreur de la base de données", 
-                "Erreur de la base de données : " + e.getMessage());
+            AlertMessage.showErrorAlert("Erreur", "Erreur de la base de données",
+                    "Erreur de la base de données : " + e.getMessage());
         }
     }
 
@@ -426,11 +464,11 @@ public class PatientController {
                 String lowerCaseFilter = newValue.toLowerCase();
 
                 return patient.getNom().toLowerCase().contains(lowerCaseFilter) ||
-                       patient.getPrenom().toLowerCase().contains(lowerCaseFilter);
+                        patient.getPrenom().toLowerCase().contains(lowerCaseFilter);
             });
         });
     }
-    
+
     // ---- Configuration du tableau ----
     private void configureCheckboxColumn() {
         checkboxColumn.setCellValueFactory(cellData -> cellData.getValue().selectedProperty());
@@ -510,12 +548,12 @@ public class PatientController {
         Button btn = new Button();
         btn.getStyleClass().add("action-button");
         btn.setStyle("-fx-background-color: transparent;");
-        
+
         ImageView icon = new ImageView();
         icon.setFitWidth(16);
         icon.setFitHeight(16);
         icon.setPreserveRatio(true);
-        
+
         switch (type) {
             case "view":
                 icon.setImage(new javafx.scene.image.Image(getClass().getResourceAsStream("/resources/icons/Eye.png")));
@@ -527,11 +565,11 @@ public class PatientController {
                 icon.setImage(new javafx.scene.image.Image(getClass().getResourceAsStream("/resources/icons/Trash 3.png")));
                 break;
         }
-        
+
         btn.setGraphic(icon);
         return btn;
     }
-    
+
     // ---- Gestion du formulaire d'ajout ----
     private void resetAddPatientForm() {
         inputNom.clear();
@@ -539,7 +577,7 @@ public class PatientController {
         inputSecuriteSociale.clear();
         inputTelephone.clear();
         inputDateNaissance.clear();
-        
+
         radioHomme.setSelected(false);
         radioFemme.setSelected(false);
     }
@@ -547,17 +585,17 @@ public class PatientController {
     // ---- Gestion du formulaire de modification ----
     private void showEditPatientForm(Patient patient) {
         patientToEdit = patient;
-        
+
         editNom.setText(patient.getNom());
         editPrenom.setText(patient.getPrenom());
         editDateNaissance.setText(patient.getDateNaissance());
-        
+
         if ("Homme".equals(patient.getSexe())) {
             editRadioHomme.setSelected(true);
         } else if ("Femme".equals(patient.getSexe())) {
             editRadioFemme.setSelected(true);
         }
-        
+
         patientsListView.setVisible(false);
         patientsAddView.setVisible(false);
         patientsEditView.setVisible(true);
@@ -566,17 +604,17 @@ public class PatientController {
     // ---- Gestion de la suppression ----
     private void deletePatient(Patient patient) {
         boolean confirmed = AlertMessage.showConfirmationAlert(
-            "Confirmation", 
-            "Suppression de patient", 
-            "Êtes-vous sûr de vouloir supprimer " + patient.getNom() + " " + patient.getPrenom() + " ?"
+                "Confirmation",
+                "Suppression de patient",
+                "Êtes-vous sûr de vouloir supprimer " + patient.getNom() + " " + patient.getPrenom() + " ?"
         );
 
         if (confirmed) {
             patients.remove(patient);
             AlertMessage.showInfoAlert(
-                "Succès", 
-                "Suppression réussie", 
-                "Patient supprimé avec succès !"
+                    "Succès",
+                    "Suppression réussie",
+                    "Patient supprimé avec succès !"
             );
         }
     }
@@ -605,16 +643,16 @@ public class PatientController {
 
         if (errorMessage.length() > 0) {
             AlertMessage.showErrorAlert(
-                "Erreur", 
-                "Validation échouée", 
-                "Veuillez corriger les erreurs suivantes :\n" + errorMessage
+                    "Erreur",
+                    "Validation échouée",
+                    "Veuillez corriger les erreurs suivantes :\n" + errorMessage
             );
             return false;
         }
 
         return true;
     }
-    
+
     // ---- Gestion de l'état du bouton de suppression d'un patient ----
     private void updateDeleteButtonState() {
         boolean atLeastOneSelected = false;

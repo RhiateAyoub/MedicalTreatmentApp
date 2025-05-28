@@ -4,7 +4,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-
+import javafx.geometry.Rectangle2D;
+import javafx.stage.Screen;
 /**
  * Classe principale de l'application MedicalTreatmentApp
  * Cette classe est responsable du lancement de l'application JavaFX
@@ -28,12 +29,22 @@ public class MedicalTreatmentApp extends Application {
         // Charger le fichier FXML
         Parent root = FXMLLoader.load(getClass().getResource("/view/RegisterView.fxml"));
         
-        // Créer la scène principale
+        /*// Créer la scène principale
+
+        Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+        Scene scene = new Scene(root, screenBounds.getWidth(), screenBounds.getHeight());
+        // Configurer la fenêtre principale de l'application
+        primaryStage.setTitle("MediConnect - Register");  // Définir le titre de la fenêtre
+        primaryStage.setScene(scene);
+
+        primaryStage.setMaximized(true);*/
+
         Scene scene = new Scene(root, 1500, 750);
-        
+
         // Configurer la fenêtre principale de l'application
         primaryStage.setTitle("MediConnect - Register");  // Définir le titre de la fenêtre
         primaryStage.setScene(scene);                           // Attacher la scène à la fenêtre
+
         primaryStage.show();                                    // Afficher la fenêtre à l'écran
     }
     

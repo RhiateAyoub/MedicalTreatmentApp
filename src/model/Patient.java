@@ -24,7 +24,7 @@ public class Patient {
     private String prenom;
     private String dateNaissance;
     private String sexe;
-    
+    private int id;
     // --- Propriétés observables
     private final BooleanProperty selected = new SimpleBooleanProperty(false);
     
@@ -38,11 +38,18 @@ public class Patient {
         this.dateNaissance = dateNaissance;
         this.sexe = sexe;
     }
-    
+    public Patient(int id,String nom, String prenom, String dateNaissance, String sexe) {
+        this.id=id;
+        this.nom = nom;
+        this.prenom = prenom;
+        this.dateNaissance = dateNaissance;
+        this.sexe = sexe;
+    }
     // ============================================================
     // ================ ACCESSEURS ET MUTATEURS ===================
     // ============================================================
-    
+    public int getId() {return id;}
+    public void setId(int id) {this.id = id;}
     public String getNom() { return nom; }
     public void setNom(String nom) { this.nom = nom; }
     

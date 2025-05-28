@@ -16,11 +16,17 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ResourceBundle;
 
 import model.RendezVous;
+import utils.Database;
 import utils.SceneManager;
+
 
 /**
  * Contrôleur de la vue d'accueil (tableau de bord)
@@ -174,5 +180,44 @@ public class AccueilController implements Initializable {
         lblTotalPatients.setText("9,024");
         lblTraitementsActifs.setText("1,405");
         lblProchainsRdv.setText(String.valueOf(rendezVousList.size()));
+        try (Connection conn = Database.connectDB()) {
+            // Total patients
+            String sqlTotalPatients = "SELECT COUNT(*) FROM Patient";
+            try (PreparedStatement ps = conn.prepareStatement(sqlTotalPatients);
+                 ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    lblTotalPatients.setText(String.valueOf(rs.getInt(1)));
+                }
+            }
+
+            // Traitements en cours
+            String sqlEnCours = "SELECT COUNT(*) FROM traitement WHERE actif = true;";
+            try (PreparedStatement ps = conn.prepareStatement(sqlEnCours);
+                 ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    lblTraitementsActifs.setText(String.valueOf(rs.getInt(1)));
+                }
+            }
+
+            // Traitements terminés
+
+
+            // Rendez-vous du mois en cours
+            String sqlRdvMois = "SELECT COUNT(*) FROM rendez_vous WHERE date >= date('now');";
+            try (PreparedStatement ps = conn.prepareStatement(sqlRdvMois);
+                 ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    lblProchainsRdv.setText(String.valueOf(rs.getInt(1)));
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private void afficherStatistiques() {
+
     }
 }

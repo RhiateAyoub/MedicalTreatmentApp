@@ -623,6 +623,8 @@ public class PatientController {
         
         editNom.setText(patient.getNom());
         editPrenom.setText(patient.getPrenom());
+        editSecuriteSociale.setText(patient.getNumSecuriteSociale());
+        editTelephone.setText(patient.getNumTelephone());
         editDateNaissance.setText(patient.getDateNaissance());
         
         if ("Homme".equals(patient.getSexe())) {

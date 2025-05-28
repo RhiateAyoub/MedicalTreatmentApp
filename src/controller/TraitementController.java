@@ -26,14 +26,22 @@ import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import model.Patient;
 
 import model.Traitement;
 import utils.AlertMessage;
+import utils.Database;
 import utils.SceneManager;
 
 /**
@@ -100,7 +108,6 @@ public class TraitementController implements Initializable {
     // --- Formulaire d'édition
     @FXML private Label labelTraitementId;
     @FXML private ComboBox<String> comboPatientModif;
-    @FXML private TextField inputNomTraitementModif;
     @FXML private TextField inputPosologieModif;
     @FXML private TextField inputTypeModif;
     @FXML private DatePicker datePickerDebutModif;
@@ -126,9 +133,7 @@ public class TraitementController implements Initializable {
     private FilteredList<Traitement> filteredTraitements;
     
     // --- List contenant les patients disponibles
-    private ObservableList<String> patientsList = FXCollections.observableArrayList(
-        "Dupont Jean", "Lambert Sophie", "Dubois Marie", "Girard Paul"
-    );
+    private ObservableList<String> patientsList = FXCollections.observableArrayList();
     
     // --- Formatage des dates
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -142,7 +147,13 @@ public class TraitementController implements Initializable {
         setupViews();
         
         // Charge les traitements avec des données d'exemple
-        initializeData();
+        //initializeData();
+        
+        // Charge les noms des patients depuis la base de données
+        loadPatientsFromDatabase();
+        
+        //// Charge les traitements depuis la base de données
+        loadTraitementsFromDatabase();
 
         // Configure la recherche avec filtrage dynamique
         setupSearchFilter();
@@ -270,8 +281,26 @@ public class TraitementController implements Initializable {
 
         if (confirmed) {
             traitementsList.removeAll(selectedTraitements);
+            for (Traitement t : selectedTraitements) {
+                    supprimerTraitementDeDB(t); // <== suppression de la base de données
+                }
             selectAllCheckbox.setSelected(false);
             updateDeleteButtonState();
+        }
+    }
+    
+    private void supprimerTraitementDeDB(Traitement traitement) {
+        String sqlDelete = "DELETE FROM traitement WHERE id = ?";
+
+        try (Connection connect = Database.connectDB();
+             PreparedStatement pstmt = connect.prepareStatement(sqlDelete)) {
+
+            pstmt.setInt(1, traitement.getId());
+
+            pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
@@ -280,7 +309,7 @@ public class TraitementController implements Initializable {
     // =======================================================================
     @FXML
     public void handleConfirmerAjoutClick(ActionEvent event) {
-        if (comboPatient.getValue().isEmpty() || inputType.getText().isEmpty() || inputDateDebut.getValue() == null) {
+        if (comboPatient.getValue() == null || inputType.getText().isEmpty() || inputDateDebut.getValue() == null) {
             AlertMessage.showErrorAlert("Erreur", "Champs vides","Veuillez remplir tous les champs obligatoires.");
             return;
         }
@@ -304,6 +333,7 @@ public class TraitementController implements Initializable {
             );
             
             traitementsList.add(nouveauTraitement);
+            ajouterTraitementDansDB(nouveauTraitement);
             
             traitementsListView.setVisible(true);
             traitementsAddView.setVisible(false);
@@ -320,6 +350,57 @@ public class TraitementController implements Initializable {
         traitementsAddView.setVisible(false);
         modifierTraitementView.setVisible(false);
     }
+    
+    private void ajouterTraitementDansDB(Traitement traitement) {
+        String queryId = "SELECT id FROM patient WHERE nom = ? AND prenom = ?";
+        String insertSQL = "INSERT INTO traitement (nom, date_debut, date_fin, type, actif, description, patient_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+        try (Connection connect = Database.connectDB();
+             PreparedStatement stmt = connect.prepareStatement(queryId);
+             PreparedStatement insertStmt = connect.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS)) {
+            
+            String[] nomPatientParts = traitement.getNomPatient().split(" ");
+            
+            stmt.setString(1, nomPatientParts[0]);
+            stmt.setString(2, nomPatientParts[1]);
+            
+            // Récupérer l'ID du patient
+            int patientId = 0;
+            ResultSet resultSet = stmt.executeQuery();
+            if (resultSet.next()) {
+                patientId = resultSet.getInt("id");
+            } else {
+                System.out.println("Patient not found.");
+            }
+
+            insertStmt.setString(1, traitement.getNomPatient());
+            insertStmt.setString(2, traitement.getDateDebutFormatted());
+            insertStmt.setString(3, traitement.getDateFinFormatted());
+            insertStmt.setString(4, traitement.getType());
+            insertStmt.setString(5, traitement.getStatut());
+            insertStmt.setString(6, traitement.getDescription());
+            insertStmt.setInt(7, patientId);
+
+            insertStmt.executeUpdate();
+            
+            // Récupérer l'ID généré
+            try (ResultSet generatedKeys = insertStmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    int generatedId = generatedKeys.getInt(1); // Obtenir l'ID généré
+                    traitement.setId(generatedId); // L'assigner à l'objet Traitement
+                } else {
+                    throw new SQLException("Création du traitement échouée, aucun ID obtenu.");
+                }
+            }
+            
+            } catch (SQLException e) {
+            e.printStackTrace();
+            AlertMessage.showErrorAlert(
+            "Erreur", 
+            "Erreur BDD : ", 
+            e.getMessage());
+        }
+    }
 
     // =======================================================================
     // ========== ACTIONS SUR LA VUE DU FORMULAIRE DE MODIFICATION ===========
@@ -333,16 +414,25 @@ public class TraitementController implements Initializable {
         
         traitementEnEdition.setNomPatient(comboPatientModif.getValue());
         traitementEnEdition.setType(inputTypeModif.getText());
+        traitementEnEdition.setPosologie(inputPosologieModif.getText());
         traitementEnEdition.setDateDebut(datePickerDebutModif.getValue());
         traitementEnEdition.setDateFin(datePickerFinModif.getValue());
         traitementEnEdition.setStatut(checkBoxActifModif.isSelected() ? "En cours" : "Terminé");
         traitementEnEdition.setDescription(textAreaObservationsModif.getText());
+        
+        modifierTraitementDansDB(traitementEnEdition);
         
         tableTraitements.refresh();
         
         traitementsListView.setVisible(true);
         traitementsAddView.setVisible(false);
         modifierTraitementView.setVisible(false);
+        
+        AlertMessage.showInfoAlert(
+            "Succès", 
+            "Modification réussie", 
+            "Traitement modifié avec succès !"
+        );
     }
     
     @FXML
@@ -351,18 +441,92 @@ public class TraitementController implements Initializable {
         traitementsAddView.setVisible(false);
         modifierTraitementView.setVisible(false);
     }
+    
+    private void modifierTraitementDansDB(Traitement traitement) { 
+        String updateSQL = "UPDATE traitement SET nom = ?, posologie = ?, date_debut = ?, date_fin = ?, type = ?, actif = ? , description = ? WHERE id = ?";
+
+        try (Connection connect = Database.connectDB();
+            PreparedStatement updateStmt = connect.prepareStatement(updateSQL)) {
+
+            updateStmt.setString(1, traitement.getNomPatient());
+            updateStmt.setString(2, traitement.getPosologie());
+            updateStmt.setString(3, traitement.getDateDebutFormatted());
+            updateStmt.setString(4, traitement.getDateFinFormatted());
+            updateStmt.setString(5, traitement.getType());
+            updateStmt.setString(6, traitement.getStatut());
+            updateStmt.setString(7, traitement.getDescription());
+            updateStmt.setInt(8, traitement.getId());
+
+            updateStmt.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            AlertMessage.showErrorAlert(
+            "Erreur", 
+            "Erreur BDD : ", 
+            e.getMessage());
+        }
+    }
 
     // ============================================================
     // =================== MÉTHODES AUXILIAIRES ===================
     // ============================================================
-    // ---- Gestion des données d'exemple ----
-    private void initializeData() {
-        traitementsList.add(new Traitement("Dupont Jean", "Antibiothérapie", LocalDate.of(2025, 4, 10), LocalDate.of(2025, 4, 20), "Terminé"));
-        traitementsList.add(new Traitement("Lambert Sophie", "Traitement diabète", LocalDate.of(2025, 2, 14), null, "En cours"));
-        traitementsList.add(new Traitement("Dubois Marie", "Radiothérapie", LocalDate.of(2025, 3, 1), LocalDate.of(2025, 5, 30), "En cours"));
-        traitementsList.add(new Traitement("Girard Paul", "Suivi post-opératoire", LocalDate.of(2025, 1, 21), LocalDate.of(2025, 3, 10), "En cours"));
-        
-        filteredTraitements = new FilteredList<>(traitementsList);
+    
+    // ---- Charger les traitements de la DB ----
+    private void loadTraitementsFromDatabase() {
+        traitementsList.clear();
+        String url = "jdbc:sqlite:src/utils/MedicalTreatmentApp_DB.db";
+
+        String query = "SELECT id, nom, posologie, date_debut, date_fin, type, actif, description, patient_id FROM traitement";
+
+        try (Connection connect = DriverManager.getConnection(url);
+             PreparedStatement prepare = connect.prepareStatement(query);
+             ResultSet result = prepare.executeQuery();){
+            
+            while (result.next()) {
+                int id = result.getInt("id");
+                String nomPatient = result.getString("nom");
+                String posologie = result.getString("posologie");
+                LocalDate dateDebut = LocalDate.parse(result.getString("date_debut"));
+                LocalDate dateFin = LocalDate.parse(result.getString("date_fin"));
+                String type = result.getString("type");
+                String statut = result.getString("actif");
+                String description = result.getString("description");
+                int patientId = result.getInt("patient_id");
+
+                traitementsList.add(new Traitement(id, nomPatient, posologie, type, dateDebut, dateFin, statut, description, patientId));
+                
+                filteredTraitements = new FilteredList<>(traitementsList);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            AlertMessage.showErrorAlert("Erreur", "Erreur de la base de données", 
+                "Erreur de la base de données : " + e.getMessage());
+        }
+    }
+    
+    // ---- Charger les donnees des patients de la DB ----
+    private void loadPatientsFromDatabase() {
+        patientsList.clear();
+        String url = "jdbc:sqlite:src/utils/MedicalTreatmentApp_DB.db";
+
+        String query = "SELECT nom, prenom FROM patient";
+
+        try (Connection connect = DriverManager.getConnection(url);
+             PreparedStatement prepare = connect.prepareStatement(query);
+             ResultSet result = prepare.executeQuery();){
+            
+            while (result.next()) {
+                String nom = result.getString("nom");
+                String prenom = result.getString("prenom");
+
+                patientsList.add(nom + " " + prenom);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            AlertMessage.showErrorAlert("Erreur", "Erreur de la base de données", 
+                "Erreur de la base de données : " + e.getMessage());
+        }
     }
 
     // ---- Gestion de la recherche et filtrage ----
@@ -507,6 +671,9 @@ public class TraitementController implements Initializable {
                          "Date de fin: " + traitement.getDateFinFormatted() + "\n" +
                          "Statut: " + traitement.getStatut();
 
+        if (traitement.getPosologie() != null && !traitement.getPosologie().isEmpty()) {
+            content += "\nPosologie: " + traitement.getPosologie();
+        }
         if (traitement.getDescription() != null && !traitement.getDescription().isEmpty()) {
             content += "\n\nDescription: " + traitement.getDescription();
         }
@@ -517,14 +684,14 @@ public class TraitementController implements Initializable {
     private void editTraitement(Traitement traitement) {
         traitementEnEdition = traitement;
         
-        labelTraitementId.setText(String.valueOf(traitementsList.indexOf(traitement) + 1));
+        labelTraitementId.setText(String.valueOf(traitement.getId()));
         comboPatientModif.setValue(traitement.getNomPatient());
         inputTypeModif.setText(traitement.getType());
+        inputPosologieModif.setText(traitement.getPosologie());
         datePickerDebutModif.setValue(traitement.getDateDebut());
         datePickerFinModif.setValue(traitement.getDateFin());
         checkBoxActifModif.setSelected(traitement.getStatut().equals("En cours"));
         textAreaObservationsModif.setText(traitement.getDescription());
-        inputNomTraitementModif.setText(traitement.getType());
         
         traitementsListView.setVisible(false);
         traitementsAddView.setVisible(false);
@@ -532,11 +699,20 @@ public class TraitementController implements Initializable {
     }
     
     private void deleteTraitement(Traitement traitement) {
-        boolean confirmed = AlertMessage.showConfirmationAlert("Confirmation de suppression", "Voulez-vous vraiment supprimer ce traitement ?", "Cette action ne peut pas être annulée."
+        boolean confirmed = AlertMessage.showConfirmationAlert(
+                "Confirmation de suppression",
+                "Voulez-vous vraiment supprimer ce traitement ?",
+                "Cette action ne peut pas être annulée."
         );
 
         if (confirmed) {
+            supprimerTraitementDeDB(traitement);
             traitementsList.remove(traitement);
+            AlertMessage.showInfoAlert(
+                "Succès", 
+                "Suppression réussie", 
+                "Traitement supprimé avec succès !"
+            );
             updateDeleteButtonState();
         }
     }

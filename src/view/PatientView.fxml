@@ -128,7 +128,7 @@
     <center>
         <StackPane fx:id="contentArea">
             <!-- Entete -->
-            <VBox fx:id="patientsListView" visible="true">
+            <VBox fx:id="patientsListView" visible="false">
                 <HBox alignment="CENTER_LEFT" style="-fx-background-color: white; -fx-border-color: #E0E0E0; -fx-border-width: 0 0 1px 0;">
                     <padding>
                         <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
@@ -223,7 +223,7 @@
             </VBox>
             
             <!-- Page des patients - Formulaire d'ajout -->
-            <VBox fx:id="patientsAddView" visible="false">
+            <VBox fx:id="patientsAddView">
                 <HBox alignment="CENTER_LEFT" style="-fx-background-color: white; -fx-border-color: #E0E0E0; -fx-border-width: 0 0 1px 0;">
                     <padding>
                         <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
@@ -280,7 +280,7 @@
                             <TextField fx:id="inputTelephone" promptText="Numéro" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                             
                             <Label text="Date de naissance:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
-                            <TextField fx:id="inputDateNaissance" promptText="JJ/MM/AAAA" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+                            <TextField fx:id="inputDateNaissance" promptText="AAAA-MM-JJ" GridPane.columnIndex="0" GridPane.rowIndex="5" />
                             
                             <Label text="Sexe:" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                             <HBox spacing="20" GridPane.columnIndex="1" GridPane.rowIndex="5">

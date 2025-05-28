@@ -207,80 +207,34 @@
                         <ColumnConstraints percentWidth="50.0" />
                         <ColumnConstraints percentWidth="50.0" />
                     </columnConstraints>
-                    
+
                     <!-- Graphique types de traitements -->
                     <VBox style="-fx-background-color: white; -fx-background-radius: 8px; -fx-border-radius: 8px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 4);" GridPane.columnIndex="0" GridPane.rowIndex="0">
                         <padding>
                             <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
                         </padding>
-                        
+
                         <Label style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Types de traitements fréquents">
                             <VBox.margin>
                                 <Insets bottom="15.0" />
                             </VBox.margin>
                         </Label>
-                        
+
                         <VBox fx:id="chartTypeTraitements" spacing="15.0">
                             <!-- Traitement 1 -->
-                            <HBox alignment="CENTER_LEFT" spacing="5.0">
-                                <Label style="-fx-font-size: 13px;" text="Antibiothérapie" />
-                                <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
-                                    <Label style="-fx-font-size: 13px;" text="75" />
-                                </HBox>
-                            </HBox>
-                            <StackPane>
-                                <Rectangle arcHeight="7.0" arcWidth="7.0" height="14.0" style="-fx-fill: #eeeeee;" width="520.0" />
-                                <Rectangle arcHeight="7.0" arcWidth="7.0" height="14.0" style="-fx-fill: #000000;" width="390.0" StackPane.alignment="CENTER_LEFT" />
-                            </StackPane>
-                            
+
+
                             <!-- Traitement 2 -->
-                            <HBox alignment="CENTER_LEFT" spacing="5.0">
-                                <Label style="-fx-font-size: 13px;" text="Radiothérapie" />
-                                <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
-                                    <Label style="-fx-font-size: 13px;" text="60" />
-                                </HBox>
-                            </HBox>
-                            <StackPane>
-                                <Rectangle arcHeight="7.0" arcWidth="7.0" height="14.0" style="-fx-fill: #eeeeee;" width="520.0" />
-                                <Rectangle arcHeight="7.0" arcWidth="7.0" height="14.0" style="-fx-fill: #000000;" width="312.0" StackPane.alignment="CENTER_LEFT" />
-                            </StackPane>
-                            
+
+
                             <!-- Traitement 3 -->
-                            <HBox alignment="CENTER_LEFT" spacing="5.0">
-                                <Label style="-fx-font-size: 13px;" text="Suivi post-opératoire" />
-                                <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
-                                    <Label style="-fx-font-size: 13px;" text="45" />
-                                </HBox>
-                            </HBox>
-                            <StackPane>
-                                <Rectangle arcHeight="7.0" arcWidth="7.0" height="14.0" style="-fx-fill: #eeeeee;" width="520.0" />
-                                <Rectangle arcHeight="7.0" arcWidth="7.0" height="14.0" style="-fx-fill: #000000;" width="234.0" StackPane.alignment="CENTER_LEFT" />
-                            </StackPane>
-                            
-                            <!-- Traitement 4 -->
-                            <HBox alignment="CENTER_LEFT" spacing="5.0">
-                                <Label style="-fx-font-size: 13px;" text="Traitement diabète" />
-                                <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
-                                    <Label style="-fx-font-size: 13px;" text="30" />
-                                </HBox>
-                            </HBox>
-                            <StackPane>
-                                <Rectangle arcHeight="7.0" arcWidth="7.0" height="14.0" style="-fx-fill: #eeeeee;" width="520.0" />
-                                <Rectangle arcHeight="7.0" arcWidth="7.0" height="14.0" style="-fx-fill: #000000;" width="156.0" StackPane.alignment="CENTER_LEFT" />
-                            </StackPane>
-                            
+
+
+
+
                             <!-- Traitement 5 -->
-                            <HBox alignment="CENTER_LEFT" spacing="5.0">
-                                <Label style="-fx-font-size: 13px;" text="Kinésithérapie" />
-                                <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
-                                    <Label style="-fx-font-size: 13px;" text="15" />
-                                </HBox>
-                            </HBox>
-                            <StackPane>
-                                <Rectangle arcHeight="7.0" arcWidth="7.0" height="14.0" style="-fx-fill: #eeeeee;" width="520.0" />
-                                <Rectangle arcHeight="7.0" arcWidth="7.0" height="14.0" style="-fx-fill: #000000;" width="78.0" StackPane.alignment="CENTER_LEFT" />
-                            </StackPane>
-                            
+
+
                             <HBox alignment="CENTER" spacing="15.0">
                                 <Label style="-fx-font-size: 12px; -fx-text-fill: #777777;" text="15" />
                                 <Label style="-fx-font-size: 12px; -fx-text-fill: #777777;" text="30" />
@@ -290,19 +244,19 @@
                             </HBox>
                         </VBox>
                     </VBox>
-                    
+
                     <!-- Graphique traitements par mois -->
                     <VBox style="-fx-background-color: white; -fx-background-radius: 8px; -fx-border-radius: 8px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 4);" GridPane.columnIndex="1" GridPane.rowIndex="0">
                         <padding>
                             <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
                         </padding>
-                        
+
                         <Label style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Traitements par mois">
                             <VBox.margin>
                                 <Insets bottom="15.0" />
                             </VBox.margin>
                         </Label>
-                        
+
                         <StackPane fx:id="barChartContainer">
                             <!-- The BarChart will be created in the controller -->
                         </StackPane>

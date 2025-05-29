@@ -21,6 +21,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.image.ImageView;
 import javafx.scene.control.RadioButton;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 
 import java.sql.SQLException;
 import java.sql.Connection;
@@ -29,7 +30,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
+import java.io.File;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import model.Patient;
+import utils.CSVExporter;
 import utils.AlertMessage;
 import utils.Database;
 import utils.SceneManager;
@@ -193,6 +200,43 @@ public class PatientController {
     // ============================================================
     // ========== ACTIONS SUR LA VUE PRINCIPALE ===================
     // ============================================================
+    
+    @FXML
+    private void handleExportPatientsCSV() {
+        List<String> headers = List.of(
+            "ID", "Nom", "Prénom", "Date de naissance",
+            "Sexe", "Téléphone", "Numéro Sécu", "Date création"
+        );
+
+        List<List<String>> rows = new ArrayList<>();
+
+        for (Patient patient : patients) {
+            rows.add(List.of(
+                String.valueOf(patient.getId()),
+                patient.getNom(),
+                patient.getPrenom(),
+                patient.getDateNaissance(),
+                patient.getSexe(),
+                patient.getNumTelephone(),
+                patient.getNumSecuriteSociale(),
+                patient.getDateCreation()
+            ));
+        }
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Enregistrer les patients");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV files (.csv)", ".csv"));
+        File file = fileChooser.showSaveDialog(btnExporter.getScene().getWindow());
+
+        if (file != null) {
+            try {
+                CSVExporter.exportToCSV(file.getAbsolutePath(), headers, rows);
+                AlertMessage.showInfoAlert("Succès", "Exportation réussie", "Les patients ont été exportés avec succès.");
+            } catch (Exception e) {
+                AlertMessage.showErrorAlert("Erreur", "Échec de l'exportation", "Une erreur est survenue lors de l'exportation :\n" + e.getMessage());
+            }
+        }
+    }
 
     // --- Gestion de select all
     @FXML

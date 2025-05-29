@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package controller;
 
 import javafx.beans.property.BooleanProperty;
@@ -377,7 +373,7 @@ public class TraitementController implements Initializable {
             insertStmt.setString(2, traitement.getDateDebutFormatted());
             insertStmt.setString(3, traitement.getDateFinFormatted());
             insertStmt.setString(4, traitement.getType());
-            insertStmt.setString(5, traitement.getStatut());
+            insertStmt.setBoolean(5, traitement.getStatut().equals("En cours"));
             insertStmt.setString(6, traitement.getDescription());
             insertStmt.setInt(7, patientId);
 
@@ -453,7 +449,7 @@ public class TraitementController implements Initializable {
             updateStmt.setString(3, traitement.getDateDebutFormatted());
             updateStmt.setString(4, traitement.getDateFinFormatted());
             updateStmt.setString(5, traitement.getType());
-            updateStmt.setString(6, traitement.getStatut());
+            updateStmt.setBoolean(6, traitement.getStatut().equals("En cours"));
             updateStmt.setString(7, traitement.getDescription());
             updateStmt.setInt(8, traitement.getId());
 
@@ -490,7 +486,7 @@ public class TraitementController implements Initializable {
                 LocalDate dateDebut = LocalDate.parse(result.getString("date_debut"));
                 LocalDate dateFin = LocalDate.parse(result.getString("date_fin"));
                 String type = result.getString("type");
-                String statut = result.getString("actif");
+                String statut = result.getBoolean("actif") ? "En cours" : "Terminé";
                 String description = result.getString("description");
                 int patientId = result.getInt("patient_id");
 

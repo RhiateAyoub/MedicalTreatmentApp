@@ -144,7 +144,7 @@
                             <Insets right="10.0" />
                         </HBox.margin>
                     </MenuButton>
-                    <Button fx:id="btnExporter" style="-fx-background-color: #252525; -fx-text-fill: white;" styleClass="btn-exporter" text="Exporter">
+                    <Button fx:id="btnExporter" onAction="#handleExportPatientsCSV" style="-fx-background-color: #252525; -fx-text-fill: white;" styleClass="btn-exporter" text="Exporter">
                         <graphic>
                             <ImageView fitHeight="16" fitWidth="16" preserveRatio="true">
                                 <Image url="@../resources/icons/Upload.png" />

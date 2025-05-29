@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package controller;
 
 import java.net.URL;
@@ -13,6 +9,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.function.Predicate;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import utils.Database;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.collections.FXCollections;
@@ -134,9 +136,10 @@ public class RendezVousController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         setupTableColumns();
-        chargerDonneesTest();
+        chargerDonneesDepuisBD();
         setupSearch();
         
+        chargerPatientsDepuisBD();
         comboPatient.setItems(patientsList);
         comboPatientModif.setItems(patientsList);
         
@@ -208,6 +211,8 @@ public class RendezVousController implements Initializable {
             rdv.setSelected(selectAll);
         }
         
+        tableRendezVous.refresh();
+        
         updateDeleteButtonState();
     }
 
@@ -249,7 +254,9 @@ public class RendezVousController implements Initializable {
             
             for (RendezVous rdv : rendezVousList) {
                 if (rdv.isSelected()) {
-                    toRemove.add(rdv);
+                    if (supprimerRendezVousEnBD(rdv)) {
+                        toRemove.add(rdv);
+                    }
                 }
             }
             
@@ -445,28 +452,136 @@ public class RendezVousController implements Initializable {
     }
     
     // ---- Gestion des données test ----
-    private void chargerDonneesTest() {
-        rendezVousList.add(new RendezVous(1, "Martin Dupont", LocalDate.of(2025, 5, 20), LocalTime.of(9, 0)));
-        rendezVousList.add(new RendezVous(2, "Sophie Leclerc", LocalDate.of(2025, 5, 20), LocalTime.of(10, 30)));
-        rendezVousList.add(new RendezVous(3, "Thomas Bernard", LocalDate.of(2025, 5, 21), LocalTime.of(14, 15)));
-        rendezVousList.add(new RendezVous(4, "Julie Moreau", LocalDate.of(2025, 5, 22), LocalTime.of(11, 0)));
-        rendezVousList.add(new RendezVous(5, "Laurent Garcia", LocalDate.of(2025, 5, 23), LocalTime.of(16, 30)));
-        
-        tableRendezVous.setItems(rendezVousList);
-        
-        for (RendezVous r : rendezVousList) {
-            attachRendezVousListener(r);
-        }
-        
-        rendezVousList.addListener((ListChangeListener<RendezVous>) change -> {
-            while (change.next()) {
-                if (change.wasAdded()) {
-                    for (RendezVous r : change.getAddedSubList()) {
-                        attachRendezVousListener(r);
-                    }
-                }
+    private void chargerDonneesDepuisBD() {
+        rendezVousList.clear();
+        String query = """
+            SELECT rv.id, rv.date, rv.heure, rv.motif, rv.commentaire,
+                   CONCAT(p.prenom, ' ', p.nom) as nom_patient
+            FROM rendez_vous rv
+            JOIN patient p ON rv.patient_id = p.id
+            ORDER BY rv.date, rv.heure
+            """;
+        try (Connection connection = Database.connectDB();
+             PreparedStatement statement = connection.prepareStatement(query);
+             ResultSet resultSet = statement.executeQuery()) {
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String nomPatient = resultSet.getString("nom_patient");
+
+                // Correction : utiliser getString() et parser manuellement
+                String dateStr = resultSet.getString("date");
+                String heureStr = resultSet.getString("heure");
+
+                LocalDate date = LocalDate.parse(dateStr);
+                LocalTime heure = LocalTime.parse(heureStr);
+
+                RendezVous rdv = new RendezVous(id, nomPatient, date, heure);
+                rendezVousList.add(rdv);
             }
-        });
+            tableRendezVous.setItems(rendezVousList);
+            for (RendezVous r : rendezVousList) {
+                attachRendezVousListener(r);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            AlertMessage.showErrorAlert("Erreur", "Erreur de base de données", 
+                              "Impossible de charger les rendez-vous depuis la base de données.");
+        } catch (DateTimeParseException e) {
+            e.printStackTrace();
+            AlertMessage.showErrorAlert("Erreur", "Erreur de format de date", 
+                              "Format de date/heure invalide dans la base de données.");
+        }
+    }
+    
+    private void chargerPatientsDepuisBD() {
+        patientsList.clear();
+
+        String query = "SELECT CONCAT(prenom, ' ', nom) as nom_complet FROM patient ORDER BY nom, prenom";
+
+        try (Connection connection = Database.connectDB();
+             PreparedStatement statement = connection.prepareStatement(query);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            while (resultSet.next()) {
+                patientsList.add(resultSet.getString("nom_complet"));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    private boolean sauvegarderRendezVousEnBD(RendezVous rdv) {
+        String query = """
+            INSERT INTO rendez_vous (date, heure, motif, commentaire, patient_id) 
+            VALUES (?, ?, ?, ?, (SELECT id FROM patient WHERE CONCAT(prenom, ' ', nom) = ?))
+            """;
+
+        try (Connection connection = Database.connectDB();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+
+            statement.setString(1, rdv.getDate().toString());
+            statement.setString(2, rdv.getHeure().toString());
+            statement.setString(3, inputMotif.getText());
+            statement.setString(4, textAreaCommentaire.getText());
+            statement.setString(5, rdv.getNomPatient());
+
+            int result = statement.executeUpdate();
+            return result > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            AlertMessage.showErrorAlert("Erreur", "Erreur de sauvegarde", 
+                              "Impossible de sauvegarder le rendez-vous.");
+            return false;
+        }
+    }
+    
+    private boolean mettreAJourRendezVousEnBD(RendezVous rdv, String nouveauNom, LocalDate nouvelleDate, LocalTime nouvelleHeure) {
+        String query = """
+            UPDATE rendez_vous 
+            SET date = ?, heure = ?, motif = ?, commentaire = ?, 
+                patient_id = (SELECT id FROM patient WHERE CONCAT(prenom, ' ', nom) = ?)
+            WHERE id = ?
+            """;
+
+        try (Connection connection = Database.connectDB();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+
+            statement.setString(1, nouvelleDate.toString());
+            statement.setString(2, nouvelleHeure.toString());
+            statement.setString(3, inputMotifModif.getText());
+            statement.setString(4, textAreaCommentaireModif.getText());
+            statement.setString(5, nouveauNom);
+            statement.setInt(6, rdv.getId());
+
+            int result = statement.executeUpdate();
+            return result > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            AlertMessage.showErrorAlert("Erreur", "Erreur de mise à jour", 
+                              "Impossible de mettre à jour le rendez-vous.");
+            return false;
+        }
+    }
+    
+    private boolean supprimerRendezVousEnBD(RendezVous rdv) {
+        String query = "DELETE FROM rendez_vous WHERE id = ?";
+
+        try (Connection connection = Database.connectDB();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+
+            statement.setInt(1, rdv.getId());
+            int result = statement.executeUpdate();
+            return result > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            AlertMessage.showErrorAlert("Erreur", "Erreur de suppression", 
+                              "Impossible de supprimer le rendez-vous.");
+            return false;
+        }
     }
     
     private void attachRendezVousListener(RendezVous rdv) {
@@ -556,6 +671,10 @@ public class RendezVousController implements Initializable {
                                                                    "Êtes-vous sûr de vouloir supprimer ce rendez-vous ?");
         
         if (result) {
+            // Supprimer de la base de données
+            if (!supprimerRendezVousEnBD(rdv)) {
+                return; // Sortir si la suppression échoue
+            }
             rendezVousList.remove(rdv);
             
             AlertMessage.showInfoAlert("Succès", "Suppression réussie", 
@@ -571,6 +690,12 @@ public class RendezVousController implements Initializable {
     
     // ---- Manipulation des données ----
     public void ajouterRendezVous(RendezVous nouveauRdv) {
+        
+        // Sauvegarder en base de données
+        if (!sauvegarderRendezVousEnBD(nouveauRdv)) {
+            return; // Sortir si la sauvegarde échoue
+        }
+        
         rendezVousList.add(nouveauRdv);
         
         tableRendezVous.refresh();
@@ -593,6 +718,11 @@ public class RendezVousController implements Initializable {
     }
     
     public void mettreAJourRendezVous(RendezVous rdv, String nouveauNom, LocalDate nouvelleDate, LocalTime nouvelleHeure) {
+        // Mettre à jour en base de données
+        if (!mettreAJourRendezVousEnBD(rdv, nouveauNom, nouvelleDate, nouvelleHeure)) {
+            return; // Sortir si la mise à jour échoue
+        }
+        
         rdv.setNomPatient(nouveauNom);
         rdv.setDate(nouvelleDate);
         rdv.setHeure(nouvelleHeure);

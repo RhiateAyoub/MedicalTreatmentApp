@@ -37,16 +37,16 @@ import utils.SceneManager;
 /**
  * Contrôleur pour la gestion des patients dans l'application MediConnect.
  * Permet de créer, lire, mettre à jour et supprimer les données patients.
- * 
+ *
  * @author pc
  */
 
 public class PatientController {
-    
+
     // ============================================================
     // ================ COMPOSANTS INTERFACE FXML ================
     // ============================================================
-    
+
     // --- Navigation
     @FXML private Button btnAccueil;
     @FXML private Button btnPatients;
@@ -55,7 +55,7 @@ public class PatientController {
     @FXML private Button btnStatistiques;
     @FXML private Button btnParametres;
     @FXML private Button btnAide;
-    
+
     // --- Actions principales
     @FXML private Button btnExporter;
     @FXML private Button btnAjouterPatient;
@@ -77,7 +77,7 @@ public class PatientController {
 
     // --- Bar de recherche
     @FXML private TextField searchField;
-    
+
     // --- Select all checkbox
     @FXML private CheckBox selectAllCheckbox;
 
@@ -104,13 +104,13 @@ public class PatientController {
     // ============================================================
     // --- Propriété booléenne indiquant si au moins un patient est actuellement sélectionné.
     private BooleanProperty anyPatientSelected = new SimpleBooleanProperty(false);
-    
+
     // --- Référence au patient sélectionné pour une opération de modification.
     private Patient patientToEdit;
-    
+
     // --- List contenant les patients
     private ObservableList<Patient> patients = FXCollections.observableArrayList();
-    
+
     // --- List contenant les patients correspondant à la recherche.
     private FilteredList<Patient> filteredPatients;
 
@@ -123,7 +123,7 @@ public class PatientController {
         patientsListView.setVisible(true);
         patientsAddView.setVisible(false);
         patientsEditView.setVisible(false);
-        
+
         // Charge les patients depuis la base de données
         loadPatientsFromDatabase();
 
@@ -145,7 +145,7 @@ public class PatientController {
             updateDeleteButtonState();
         });
     }
-    
+
     // =============================================================================
     // ============== ACTIONS SUR LE MENU LATÉRAL (Navigation entre les vues) ======
     // =============================================================================
@@ -193,7 +193,7 @@ public class PatientController {
     // ============================================================
     // ========== ACTIONS SUR LA VUE PRINCIPALE ===================
     // ============================================================
-    
+
     // --- Gestion de select all
     @FXML
     public void handleSelectAllCheckbox() {
@@ -214,7 +214,7 @@ public class PatientController {
         patientsAddView.setVisible(true);
         patientsEditView.setVisible(false);
     }
-    
+
     // --- GESTION DE LA SUPPRESSION (événements @FXML) ========
     @FXML
     public void handleDeletePatients() {
@@ -228,9 +228,9 @@ public class PatientController {
 
         if (!patientsToRemove.isEmpty()) {
             boolean confirmed = AlertMessage.showConfirmationAlert(
-                "Confirmation", 
-                "Suppression de patient(s)", 
-                "Êtes-vous sûr de vouloir supprimer " + patientsToRemove.size() + " patient(s) ?"
+                    "Confirmation",
+                    "Suppression de patient(s)",
+                    "Êtes-vous sûr de vouloir supprimer " + patientsToRemove.size() + " patient(s) ?"
             );
 
             if (confirmed) {
@@ -240,22 +240,22 @@ public class PatientController {
                 patients.removeAll(patientsToRemove);
                 selectAllCheckbox.setSelected(false);
                 updateDeleteButtonState();
-                
+
                 AlertMessage.showInfoAlert(
-                    "Succès", 
-                    "Suppression réussie", 
-                    "Patient(s) supprimé(s) avec succès !"
+                        "Succès",
+                        "Suppression réussie",
+                        "Patient(s) supprimé(s) avec succès !"
                 );
             }
         } else {
             AlertMessage.showErrorAlert(
-                "Erreur", 
-                "Aucune sélection", 
-                "Aucun patient sélectionné."
+                    "Erreur",
+                    "Aucune sélection",
+                    "Aucun patient sélectionné."
             );
         }
     }
-    
+
     // Methode pour supprimer les patients de la DB
     private void supprimerPatientDeDB(Patient patient) {
         String sql = "DELETE FROM patient WHERE id = ?";
@@ -298,9 +298,9 @@ public class PatientController {
         patientsAddView.setVisible(false);
 
         AlertMessage.showInfoAlert(
-            "Succès", 
-            "Ajout réussi", 
-            "Patient ajouté avec succès !"
+                "Succès",
+                "Ajout réussi",
+                "Patient ajouté avec succès !"
         );
     }
 
@@ -310,11 +310,11 @@ public class PatientController {
         patientsListView.setVisible(true);
         patientsAddView.setVisible(false);
     }
-    
+
     private void ajouterPatientDansDB(Patient patient) {
 
-       String checkSecuSQL = "SELECT * FROM patient WHERE numero_securite_sociale = ?";
-       String insertSQL = "INSERT INTO patient (nom, prenom, date_naissance, sexe, numero_telephone, numero_securite_sociale, date_creation) VALUES (?, ?, ?, ?, ?, ?, datetime('now'))";
+        String checkSecuSQL = "SELECT * FROM patient WHERE numero_securite_sociale = ?";
+        String insertSQL = "INSERT INTO patient (nom, prenom, date_naissance, sexe, numero_telephone, numero_securite_sociale, date_creation) VALUES (?, ?, ?, ?, ?, ?, datetime('now'))";
 
         try (Connection connect = Database.connectDB();
              PreparedStatement checkStmt = connect.prepareStatement(checkSecuSQL);
@@ -324,9 +324,9 @@ public class PatientController {
             ResultSet result = checkStmt.executeQuery();
             if (result.next()) {
                 AlertMessage.showErrorAlert(
-                "Erreur", 
-                "Patient déjà existant", 
-                patient.getNumSecuriteSociale() + " existe déjà !");
+                        "Erreur",
+                        "Patient déjà existant",
+                        patient.getNumSecuriteSociale() + " existe déjà !");
                 return;
             }
 
@@ -338,7 +338,7 @@ public class PatientController {
             insertStmt.setString(6, patient.getNumSecuriteSociale());
 
             insertStmt.executeUpdate();
-            
+
             // Récupérer l'ID généré
             try (ResultSet generatedKeys = insertStmt.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
@@ -348,7 +348,7 @@ public class PatientController {
                     throw new SQLException("Création du patient échouée, aucun ID obtenu.");
                 }
             }
-            
+
             // Récupérer la date de création généré
             String selectSQL = "SELECT date_creation FROM patient WHERE id = ?";
             try (PreparedStatement selectStmt = connect.prepareStatement(selectSQL)) {
@@ -363,9 +363,9 @@ public class PatientController {
         } catch (SQLException e) {
             e.printStackTrace();
             AlertMessage.showErrorAlert(
-            "Erreur", 
-            "Erreur BDD : ", 
-            e.getMessage());
+                    "Erreur",
+                    "Erreur BDD : ",
+                    e.getMessage());
         }
     }
 
@@ -384,7 +384,7 @@ public class PatientController {
         patientToEdit.setNumTelephone(editTelephone.getText().trim());
         patientToEdit.setNumSecuriteSociale(editSecuriteSociale.getText().trim());
         patientToEdit.setSexe(editRadioHomme.isSelected() ? "Homme" : (editRadioFemme.isSelected() ? "Femme" : ""));
-        
+
         modifierPatientDansDB(patientToEdit);
 
         tablePatients.refresh();
@@ -393,9 +393,9 @@ public class PatientController {
         patientsEditView.setVisible(false);
 
         AlertMessage.showInfoAlert(
-            "Succès", 
-            "Modification réussie", 
-            "Patient modifié avec succès !"
+                "Succès",
+                "Modification réussie",
+                "Patient modifié avec succès !"
         );
     }
 
@@ -404,12 +404,12 @@ public class PatientController {
         patientsListView.setVisible(true);
         patientsEditView.setVisible(false);
     }
-    
-    private void modifierPatientDansDB(Patient patient) { 
+
+    private void modifierPatientDansDB(Patient patient) {
         String updateSQL = "UPDATE patient SET nom = ?, prenom = ?, date_naissance = ?, sexe = ?, numero_telephone = ?, numero_securite_sociale = ? WHERE id = ?";
 
         try (Connection connect = Database.connectDB();
-            PreparedStatement updateStmt = connect.prepareStatement(updateSQL)) {
+             PreparedStatement updateStmt = connect.prepareStatement(updateSQL)) {
 
             updateStmt.setString(1, patient.getNom());
             updateStmt.setString(2, patient.getPrenom());
@@ -424,9 +424,9 @@ public class PatientController {
         } catch (SQLException e) {
             e.printStackTrace();
             AlertMessage.showErrorAlert(
-            "Erreur", 
-            "Erreur BDD : ", 
-            e.getMessage());
+                    "Erreur",
+                    "Erreur BDD : ",
+                    e.getMessage());
         }
     }
 
@@ -443,7 +443,7 @@ public class PatientController {
         try (Connection connect = DriverManager.getConnection(url);
              PreparedStatement prepare = connect.prepareStatement(query);
              ResultSet result = prepare.executeQuery();){
-            
+
             while (result.next()) {
                 int id = result.getInt("id");
                 String nom = result.getString("nom");
@@ -458,8 +458,8 @@ public class PatientController {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            AlertMessage.showErrorAlert("Erreur", "Erreur de la base de données", 
-                "Erreur de la base de données : " + e.getMessage());
+            AlertMessage.showErrorAlert("Erreur", "Erreur de la base de données",
+                    "Erreur de la base de données : " + e.getMessage());
         }
     }
 
@@ -476,11 +476,11 @@ public class PatientController {
                 String lowerCaseFilter = newValue.toLowerCase();
 
                 return patient.getNom().toLowerCase().contains(lowerCaseFilter) ||
-                       patient.getPrenom().toLowerCase().contains(lowerCaseFilter);
+                        patient.getPrenom().toLowerCase().contains(lowerCaseFilter);
             });
         });
     }
-    
+
     // ---- Configuration du tableau ----
     private void configureCheckboxColumn() {
         checkboxColumn.setCellValueFactory(cellData -> cellData.getValue().selectedProperty());
@@ -561,12 +561,12 @@ public class PatientController {
         Button btn = new Button();
         btn.getStyleClass().add("action-button");
         btn.setStyle("-fx-background-color: transparent;");
-        
+
         ImageView icon = new ImageView();
         icon.setFitWidth(16);
         icon.setFitHeight(16);
         icon.setPreserveRatio(true);
-        
+
         switch (type) {
             case "view":
                 icon.setImage(new javafx.scene.image.Image(getClass().getResourceAsStream("/resources/icons/Eye.png")));
@@ -578,23 +578,23 @@ public class PatientController {
                 icon.setImage(new javafx.scene.image.Image(getClass().getResourceAsStream("/resources/icons/Trash 3.png")));
                 break;
         }
-        
+
         btn.setGraphic(icon);
         return btn;
     }
-    
+
     private void showPatientDetails(Patient patient) {
         // Create a message to show in the alert, combining the patient details
         String patientDetails = String.format(
-            "Nom: %s\nPrénom: %s\nDate de Naissance: %s\nSexe: %s\nNuméro de Téléphone: %s\n" +
-            "Numéro de Sécurité Sociale: %s\nDate de Création: %s",
-            patient.getNom(),
-            patient.getPrenom(),
-            patient.getDateNaissance(),
-            patient.getSexe(),
-            patient.getNumTelephone(),
-            patient.getNumSecuriteSociale(),
-            patient.getDateCreation()
+                "Nom: %s\nPrénom: %s\nDate de Naissance: %s\nSexe: %s\nNuméro de Téléphone: %s\n" +
+                        "Numéro de Sécurité Sociale: %s\nDate de Création: %s",
+                patient.getNom(),
+                patient.getPrenom(),
+                patient.getDateNaissance(),
+                patient.getSexe(),
+                patient.getNumTelephone(),
+                patient.getNumSecuriteSociale(),
+                patient.getDateCreation()
         );
 
         // Create an Alert to display the details
@@ -604,7 +604,7 @@ public class PatientController {
                 patientDetails
         );
     }
-    
+
     // ---- Gestion du formulaire d'ajout ----
     private void resetAddPatientForm() {
         inputNom.clear();
@@ -612,7 +612,7 @@ public class PatientController {
         inputSecuriteSociale.clear();
         inputTelephone.clear();
         inputDateNaissance.clear();
-        
+
         radioHomme.setSelected(false);
         radioFemme.setSelected(false);
     }
@@ -620,19 +620,19 @@ public class PatientController {
     // ---- Gestion du formulaire de modification ----
     private void showEditPatientForm(Patient patient) {
         patientToEdit = patient;
-        
+
         editNom.setText(patient.getNom());
         editPrenom.setText(patient.getPrenom());
         editSecuriteSociale.setText(patient.getNumSecuriteSociale());
         editTelephone.setText(patient.getNumTelephone());
         editDateNaissance.setText(patient.getDateNaissance());
-        
+
         if ("Homme".equals(patient.getSexe())) {
             editRadioHomme.setSelected(true);
         } else if ("Femme".equals(patient.getSexe())) {
             editRadioFemme.setSelected(true);
         }
-        
+
         patientsListView.setVisible(false);
         patientsAddView.setVisible(false);
         patientsEditView.setVisible(true);
@@ -641,18 +641,18 @@ public class PatientController {
     // ---- Gestion de la suppression ----
     private void deletePatient(Patient patient) {
         boolean confirmed = AlertMessage.showConfirmationAlert(
-            "Confirmation", 
-            "Suppression de patient", 
-            "Êtes-vous sûr de vouloir supprimer " + patient.getNom() + " " + patient.getPrenom() + " ?"
+                "Confirmation",
+                "Suppression de patient",
+                "Êtes-vous sûr de vouloir supprimer " + patient.getNom() + " " + patient.getPrenom() + " ?"
         );
 
         if (confirmed) {
             patients.remove(patient);
             supprimerPatientDeDB(patient);
             AlertMessage.showInfoAlert(
-                "Succès", 
-                "Suppression réussie", 
-                "Patient supprimé avec succès !"
+                    "Succès",
+                    "Suppression réussie",
+                    "Patient supprimé avec succès !"
             );
         }
     }
@@ -681,16 +681,16 @@ public class PatientController {
 
         if (errorMessage.length() > 0) {
             AlertMessage.showErrorAlert(
-                "Erreur", 
-                "Validation échouée", 
-                "Veuillez corriger les erreurs suivantes :\n" + errorMessage
+                    "Erreur",
+                    "Validation échouée",
+                    "Veuillez corriger les erreurs suivantes :\n" + errorMessage
             );
             return false;
         }
 
         return true;
     }
-    
+
     // ---- Gestion de l'état du bouton de suppression d'un patient ----
     private void updateDeleteButtonState() {
         boolean atLeastOneSelected = false;

@@ -1,5 +1,6 @@
 package controller;
 
+import java.io.File;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -33,10 +34,12 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import javafx.stage.FileChooser;
 import model.Patient;
 
 import model.Traitement;
 import utils.AlertMessage;
+import utils.CSVExporter;
 import utils.Database;
 import utils.SceneManager;
 
@@ -222,6 +225,44 @@ public class TraitementController implements Initializable {
     // ============================================================
     // ========== ACTIONS SUR LA VUE PRINCIPALE ===================
     // ============================================================
+    
+    @FXML
+    private void handleExportPatientsCSV() {
+        List<String> headers = List.of(
+            "ID", "Nom du Patient", "Type", "Posologie", "Date de début",
+            "Date de fin", "Statut", "Description", "ID du Patient"
+        );
+
+        List<List<String>> rows = new ArrayList<>();
+
+        for (Traitement traitement : traitementsList) {
+            rows.add(List.of(
+                String.valueOf(traitement.getId()),
+                traitement.getNomPatient(),
+                traitement.getType(),
+                traitement.getPosologie(),
+                traitement.getDateDebutFormatted(),
+                traitement.getDateFinFormatted(),
+                traitement.getStatut(),
+                traitement.getDescription(),
+                String.valueOf(traitement.getPatientId())
+            ));
+        }
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Enregistrer les traitements");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV files (.csv)", ".csv"));
+        File file = fileChooser.showSaveDialog(btnExporter.getScene().getWindow());
+
+        if (file != null) {
+            try {
+                CSVExporter.exportToCSV(file.getAbsolutePath(), headers, rows);
+                AlertMessage.showInfoAlert("Succès", "Exportation réussie", "Les traitements ont été exportés avec succès.");
+            } catch (Exception e) {
+                AlertMessage.showErrorAlert("Erreur", "Échec de l'exportation", "Une erreur est survenue lors de l'exportation :\n" + e.getMessage());
+            }
+        }
+    }
     
     // --- Gestion de select all
     @FXML
@@ -725,6 +766,12 @@ public class TraitementController implements Initializable {
         }
         
         anyTraitementSelected.set(atLeastOneSelected);
+        
+        if (atLeastOneSelected) {
+            btnSupprimerTraitements.setStyle("-fx-background-color: red; -fx-text-fill: white; -fx-background-radius: 5px; -fx-border-radius: 5px;");
+        } else {
+            btnSupprimerTraitements.setStyle("-fx-background-color: #F8F8F8; -fx-border-color: #CCCCCC; -fx-background-radius: 5px; -fx-border-radius: 5px;");
+        }
     }
 
     // ============================================================

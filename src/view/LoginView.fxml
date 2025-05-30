@@ -11,13 +11,12 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-<?import javafx.scene.control.CheckBox?>
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.LoginController">
    <left>
       <VBox prefWidth="260.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #E0E0E0; -fx-border-width: 0 1px 0 0;" BorderPane.alignment="CENTER">
          <children>
-            <Label text="Nom d'appli" textFill="#333333">
+            <Label text="MediConnect" textFill="#333333">
                <font>
                   <Font name="System Bold" size="24.0" />
                </font>
@@ -140,13 +139,12 @@
                   <PasswordField fx:id="passwordField" prefHeight="40.0" promptText="Entrez votre mot de passe" />
 
                   <!-- Password visible -->
-                  <TextField fx:id="visiblePasswordField" prefHeight="40.0" promptText="Entrez votre mot de passe"
-                             visible="false" managed="false" />
+                  <TextField fx:id="visiblePasswordField" managed="false" prefHeight="40.0" promptText="Entrez votre mot de passe" visible="false" />
 
                   <!-- Checkbox -->
-                  <CheckBox fx:id="ShowPasswordCheckbox" mnemonicParsing="false" text="Afficher le mot de passe" onAction="#togglePasswordVisibility">
+                  <CheckBox fx:id="ShowPasswordCheckbox" mnemonicParsing="false" onAction="#togglePasswordVisibility" prefHeight="32.0" prefWidth="149.0" text="Afficher le mot de passe">
                      <VBox.margin>
-                        <Insets bottom="20.0" />
+                        <Insets bottom="10.0" />
                      </VBox.margin>
                   </CheckBox>
                   <Button fx:id="loginButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleLoginClick" prefHeight="40.0" style="-fx-background-color: #333333; -fx-text-fill: white; -fx-background-radius: 5;" text="Se connecter">

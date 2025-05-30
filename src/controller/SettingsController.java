@@ -5,19 +5,25 @@
 package controller;
 
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
+import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 
+import model.Utilisateur;
 import utils.AlertMessage;
+import utils.Database;
 import utils.SceneManager;
+import utils.SessionManager;
+
 
 /**
  * Contrôleur pour la gestion des paramètres dans l'application MediConnect.
@@ -49,19 +55,28 @@ public class SettingsController implements Initializable {
     // --- Configuration
     @FXML private ComboBox<String> comboTheme;
     @FXML private ComboBox<String> comboLangue;
+    @FXML private Label lblNomUtilisateur;
+    @FXML private Label lblDerniereConnexion;
+    @FXML private PasswordField ancienMotDePasseField;
+    @FXML private PasswordField nouveauMotDePasseField;
+    @FXML private PasswordField confirmerMotDePasseField;
 
     // ==============================================================================================================================
     // ================= MÉTHODE D’INITIALISATION (Méthode appelée automatiquement après le chargement du fichier FXML) =============
     // ==============================================================================================================================
     @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        comboTheme.setItems(FXCollections.observableArrayList("Clair", "Sombre", "Système"));
-        comboTheme.setValue("Clair");
 
-        comboLangue.setItems(FXCollections.observableArrayList("Français", "English", "Español"));
-        comboLangue.setValue("Français");
+    public void initialize(URL location, ResourceBundle resources) {
+        Utilisateur utilisateur = SessionManager.getUtilisateurActuel();
+        if (utilisateur != null) {
+            lblNomUtilisateur.setText(utilisateur.getNomUtilisateur());
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+            lblDerniereConnexion.setText(utilisateur.getDerniereConnexion().format(formatter));
+        }
     }
-    
+
+
     // =============================================================================
     // ============== ACTIONS SUR LE MENU LATÉRAL (Navigation entre les vues) ======
     // =============================================================================
@@ -111,11 +126,54 @@ public class SettingsController implements Initializable {
     // ============================================================
     @FXML
     private void handleChangerMotDePasse() {
-        Alert alert = new Alert(AlertType.INFORMATION);
-        alert.setTitle("Changer le mot de passe");
-        alert.setHeaderText("Fonctionnalité à venir");
-        alert.setContentText("La fonctionnalité de changement de mot de passe sera disponible dans une prochaine version.");
-        alert.showAndWait();
+        //changer mot de passe
+        String ancien = ancienMotDePasseField.getText().trim();
+        String nouveau = nouveauMotDePasseField.getText().trim();
+        String confirmer = confirmerMotDePasseField.getText().trim();
+
+        if (ancien.isEmpty() || nouveau.isEmpty() || confirmer.isEmpty()) {
+            AlertMessage.showErrorAlert("Erreur", "Champs vides", "Veuillez remplir tous les champs.");
+            return;
+        }
+
+        if (!nouveau.equals(confirmer)) {
+            AlertMessage.showErrorAlert("Erreur", "Incohérence", "Les nouveaux mots de passe ne correspondent pas.");
+            return;
+        }
+
+        String username = SessionManager.getUtilisateurActuel().getNomUtilisateur();
+
+        try (Connection conn = Database.connectDB()) {
+            String checkQuery = "SELECT * FROM utilisateur WHERE nom_utilisateur = ? AND mot_de_passe = ?";
+            PreparedStatement checkStmt = conn.prepareStatement(checkQuery);
+            checkStmt.setString(1, username);
+            checkStmt.setString(2, ancien);
+            ResultSet rs = checkStmt.executeQuery();
+
+            if (!rs.next()) {
+                AlertMessage.showErrorAlert("Erreur", "Mot de passe incorrect", "L'ancien mot de passe est erroné.");
+                return;
+            }
+
+            String updateQuery = "UPDATE utilisateur SET mot_de_passe = ? WHERE nom_utilisateur = ?";
+            PreparedStatement updateStmt = conn.prepareStatement(updateQuery);
+            updateStmt.setString(1, nouveau);
+            updateStmt.setString(2, username);
+            int rows = updateStmt.executeUpdate();
+
+            if (rows > 0) {
+                AlertMessage.showInfoAlert("Succès", "Mot de passe changé", "Votre mot de passe a été mis à jour.");
+                ancienMotDePasseField.clear();
+                nouveauMotDePasseField.clear();
+                confirmerMotDePasseField.clear();
+            } else {
+                AlertMessage.showErrorAlert("Erreur", "Échec", "La mise à jour a échoué.");
+            }
+
+        } catch (Exception e) {
+            AlertMessage.showErrorAlert("Erreur", "Base de données", "Une erreur est survenue : " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     @FXML

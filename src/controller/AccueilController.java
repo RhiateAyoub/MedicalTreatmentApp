@@ -21,11 +21,16 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
 import java.util.ResourceBundle;
 
 import model.RendezVous;
+import model.Utilisateur;
+import utils.AlertMessage;
 import utils.Database;
 import utils.SceneManager;
+import utils.SessionManager;
 
 
 /**
@@ -59,6 +64,7 @@ public class AccueilController implements Initializable {
     @FXML private Label lblTotalPatients;
     @FXML private Label lblTraitementsActifs;
     @FXML private Label lblProchainsRdv;
+    @FXML private Label labelBienvenue;
 
     // --- Tableau de rendez-vous
     @FXML private TableView<RendezVous> tableRendezVous;
@@ -77,13 +83,23 @@ public class AccueilController implements Initializable {
     // ==============================================================================================================================
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        
+        // Message de Bienvenue
+        Utilisateur utilisateur = SessionManager.getUtilisateurActuel();
+        
+        if (utilisateur != null && utilisateur.getRole().equals("Médecin")) {
+            labelBienvenue.setText("Bienvenue Dr. " + utilisateur.getNomUtilisateur() + "!");
+        } else if (utilisateur != null && utilisateur.getRole().equals("Secrétaire")){
+            labelBienvenue.setText("Bienvenue " + utilisateur.getNomUtilisateur() + "!");
+        }
+        
         // Configuration des colonnes de la table des rendez-vous
         colNomPatient.setCellValueFactory(new PropertyValueFactory<>("nomPatient"));
         colDate.setCellValueFactory(new PropertyValueFactory<>("date"));
-        colType.setCellValueFactory(new PropertyValueFactory<>("type"));
+        colType.setCellValueFactory(new PropertyValueFactory<>("heure"));
 
         // Chargement des données de test
-        chargerDonneesTest();
+        chargerDonneesDepuisBD();
 
         // Mise à jour des statistiques affichées sur le tableau de bord
         mettreAJourStatistiques();
@@ -170,15 +186,49 @@ public class AccueilController implements Initializable {
 
     // --- Chargement des données de démonstration
     private void chargerDonneesTest() {
-        rendezVousList.add(new RendezVous("Dupont Jean", LocalDate.of(2025, 06, 05), "Consultation"));
-        rendezVousList.add(new RendezVous("Lambert Sophie", LocalDate.of(2025, 07, 05), "Suivi traitement"));
-        rendezVousList.add(new RendezVous("Dubois Marie", LocalDate.of(2025, 10, 05), "Contrôle tension"));
+        rendezVousList.add(new RendezVous("Dupont Jean", LocalDate.of(2025, 06, 05), LocalTime.of(14, 30)));
+        rendezVousList.add(new RendezVous("Lambert Sophie", LocalDate.of(2025, 07, 05), LocalTime.of(14, 30)));
+        rendezVousList.add(new RendezVous("Dubois Marie", LocalDate.of(2025, 10, 05), LocalTime.of(14, 30)));
+    }
+    
+    // ---- Gestion des données test ----
+    private void chargerDonneesDepuisBD() {
+        rendezVousList.clear();
+        String query = """
+            SELECT rv.date, rv.heure, CONCAT(p.prenom, ' ', p.nom) as nom_patient
+            FROM rendez_vous rv
+            JOIN patient p ON rv.patient_id = p.id
+                       WHERE rv.date >= date('now')
+            ORDER BY rv.date, rv.heure
+            """;
+        try (Connection connection = Database.connectDB();
+             PreparedStatement statement = connection.prepareStatement(query);
+             ResultSet resultSet = statement.executeQuery()) {
+            while (resultSet.next()) {
+                String nomPatient = resultSet.getString("nom_patient");
+                String dateStr = resultSet.getString("date");
+                String heureStr = resultSet.getString("heure");
+
+                LocalDate date = LocalDate.parse(dateStr);
+                LocalTime heure = LocalTime.parse(heureStr);
+
+                RendezVous rdv = new RendezVous(nomPatient, date, heure);
+                rendezVousList.add(rdv);
+            }
+            tableRendezVous.setItems(rendezVousList);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            AlertMessage.showErrorAlert("Erreur", "Erreur de base de données", 
+                              "Impossible de charger les rendez-vous depuis la base de données.");
+        } catch (DateTimeParseException e) {
+            e.printStackTrace();
+            AlertMessage.showErrorAlert("Erreur", "Erreur de format de date", 
+                              "Format de date/heure invalide dans la base de données.");
+        }
     }
 
     // --- Calcul des statistiques affichées
     private void mettreAJourStatistiques() {
-        lblTotalPatients.setText("9,024");
-        lblTraitementsActifs.setText("1,405");
         lblProchainsRdv.setText(String.valueOf(rendezVousList.size()));
         try (Connection conn = Database.connectDB()) {
             // Total patients
@@ -198,9 +248,6 @@ public class AccueilController implements Initializable {
                     lblTraitementsActifs.setText(String.valueOf(rs.getInt(1)));
                 }
             }
-
-            // Traitements terminés
-
 
             // Rendez-vous du mois en cours
             String sqlRdvMois = "SELECT COUNT(*) FROM rendez_vous WHERE date >= date('now');";

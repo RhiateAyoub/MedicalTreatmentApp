@@ -1,5 +1,6 @@
 package controller;
 
+import java.io.File;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -41,10 +42,13 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.util.Callback;
 
 import model.RendezVous;
+import model.Traitement;
 import utils.AlertMessage;
+import utils.CSVExporter;
 import utils.SceneManager;
 
 /**
@@ -124,10 +128,7 @@ public class RendezVousController implements Initializable {
     private RendezVous rendezVousEnModification;
     
     // --- Données de référence
-    private final ObservableList<String> patientsList = FXCollections.observableArrayList(
-        "Martin Dupont", "Sophie Leclerc", "Thomas Bernard", "Julie Moreau", 
-        "Laurent Garcia", "Emma Dubois", "Lucas Martinez", "Camille Petit"
-    );
+    private final ObservableList<String> patientsList = FXCollections.observableArrayList();
 
     // ==============================================================================================================================
     // ================= MÉTHODE D'INITIALISATION (Méthode appelée automatiquement après le chargement du fichier FXML) =============
@@ -142,8 +143,6 @@ public class RendezVousController implements Initializable {
         chargerPatientsDepuisBD();
         comboPatient.setItems(patientsList);
         comboPatientModif.setItems(patientsList);
-        
-        btnExporter.setOnAction(event -> exporterRendezVous());
         
         btnSupprimer.setDisable(true);
         updateDeleteButtonState();
@@ -201,6 +200,42 @@ public class RendezVousController implements Initializable {
     // ============================================================
     // ========== ACTIONS SUR LA VUE PRINCIPALE ===================
     // ============================================================
+    
+    @FXML
+    private void handleExportPatientsCSV() {
+        List<String> headers = List.of(
+            "ID", "Nom du Patient", "Date", "Heure",
+            "Motif", "Commentaire", "ID du Patient"
+        );
+
+        List<List<String>> rows = new ArrayList<>();
+
+        for (RendezVous rdv : rendezVousList) {
+            rows.add(List.of(
+                String.valueOf(rdv.getId()),
+                rdv.getNomPatient(),
+                String.valueOf(rdv.getDate()),
+                String.valueOf(rdv.getHeure()),
+                rdv.getMotif(),
+                rdv.getCommentaire(),
+                String.valueOf(rdv.getPatientId())
+            ));
+        }
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Enregistrer les rendez-vous");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV files (.csv)", ".csv"));
+        File file = fileChooser.showSaveDialog(btnExporter.getScene().getWindow());
+
+        if (file != null) {
+            try {
+                CSVExporter.exportToCSV(file.getAbsolutePath(), headers, rows);
+                AlertMessage.showInfoAlert("Succès", "Exportation réussie", "Les rendez-vous ont été exportés avec succès.");
+            } catch (Exception e) {
+                AlertMessage.showErrorAlert("Erreur", "Échec de l'exportation", "Une erreur est survenue lors de l'exportation :\n" + e.getMessage());
+            }
+        }
+    }
     
     // --- Gestion de select all
     @FXML
@@ -286,9 +321,20 @@ public class RendezVousController implements Initializable {
             LocalDate date = datePickerRendezVous.getValue();
             LocalTime heure = LocalTime.parse(inputHeure.getText(), timeFormatter);
             
+            // S'asssurer de ne pas inserer des valeurs nulles dans la BD
+            String motif = inputMotif.getText();
+            if (motif == null || motif.trim().isEmpty()) {
+                motif = "";
+            }
+            
+            String commentaire = textAreaCommentaire.getText();
+            if (commentaire == null || commentaire.trim().isEmpty()) {
+                commentaire = "";
+            }
+            
             int nouveauId = rendezVousList.isEmpty() ? 1 : rendezVousList.get(rendezVousList.size() - 1).getId() + 1;
             
-            RendezVous nouveauRdv = new RendezVous(nouveauId, nomPatient, date, heure);
+            RendezVous nouveauRdv = new RendezVous(nouveauId, nomPatient, date, heure, motif, commentaire);
             
             ajouterRendezVous(nouveauRdv);
             
@@ -406,11 +452,19 @@ public class RendezVousController implements Initializable {
             @Override
             public TableCell<RendezVous, Void> call(final TableColumn<RendezVous, Void> param) {
                 return new TableCell<RendezVous, Void>() {
+                    private final Button btnView = new Button();
                     private final Button btnEdit = new Button();
                     private final Button btnDelete = new Button();
                     private final HBox actionPane = new HBox(5);
 
                     {
+                        
+                        ImageView viewIcon = new ImageView(new Image(getClass().getResourceAsStream("/resources/icons/Eye.png")));
+                        viewIcon.setFitHeight(16);
+                        viewIcon.setFitWidth(16);
+                        btnView.setGraphic(viewIcon);
+                        btnView.setStyle("-fx-background-color: transparent;");
+                        
                         ImageView editIcon = new ImageView(new Image(getClass().getResourceAsStream("/resources/icons/Edit 3.png")));
                         editIcon.setFitHeight(16);
                         editIcon.setFitWidth(16);
@@ -422,6 +476,11 @@ public class RendezVousController implements Initializable {
                         deleteIcon.setFitWidth(16);
                         btnDelete.setGraphic(deleteIcon);
                         btnDelete.setStyle("-fx-background-color: transparent;");
+                        
+                        btnView.setOnAction(event -> {
+                            RendezVous rdv = getTableView().getItems().get(getIndex());
+                            afficherRendezVous(rdv);
+                        });
 
                         btnEdit.setOnAction(event -> {
                             RendezVous rdv = getTableView().getItems().get(getIndex());
@@ -433,7 +492,7 @@ public class RendezVousController implements Initializable {
                             supprimerRendezVous(rdv);
                         });
 
-                        actionPane.getChildren().addAll(btnEdit, btnDelete);
+                        actionPane.getChildren().addAll(btnView, btnEdit, btnDelete);
                         actionPane.setAlignment(Pos.CENTER);
                     }
 
@@ -451,11 +510,54 @@ public class RendezVousController implements Initializable {
         });
     }
     
+    private void afficherRendezVous(RendezVous rendezVous) {
+        // Récupérer les détails complets du rendez-vous depuis la base de données
+        String query = "SELECT date, heure, motif, commentaire, patient_id FROM rendez_vous WHERE id = ?";
+        try (Connection connection = Database.connectDB();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, rendezVous.getId());
+            ResultSet rs = statement.executeQuery();
+
+            if (rs.next()) {
+                String motif = rs.getString("motif");
+                String commentaire = rs.getString("commentaire");
+
+                // Créer un message pour afficher dans l'alerte
+                String rendezVousDetails = String.format(
+                        "Patient: %s\nDate: %s\nHeure: %s\nMotif: %s\nCommentaire: %s",
+                        rendezVous.getNomPatient(),
+                        rendezVous.getDate(),
+                        rendezVous.getHeure(),
+                        motif != null && !motif.isEmpty() ? motif : "Non spécifié",
+                        commentaire != null && !commentaire.isEmpty() ? commentaire : "Aucun commentaire"
+                );
+
+                // Créer une Alert pour afficher les détails
+                AlertMessage.showInfoAlert(
+                        "Détails du Rendez-vous",
+                        "Informations complètes du rendez-vous",
+                        rendezVousDetails
+                );
+            }
+
+            rs.close();
+            statement.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            AlertMessage.showErrorAlert(
+                    "Erreur",
+                    "Erreur lors de la récupération des détails",
+                    "Impossible de récupérer les détails du rendez-vous"
+            );
+        }
+    }
+    
     // ---- Gestion des données test ----
     private void chargerDonneesDepuisBD() {
         rendezVousList.clear();
         String query = """
-            SELECT rv.id, rv.date, rv.heure, rv.motif, rv.commentaire,
+            SELECT rv.id, rv.date, rv.heure, rv.motif, rv.commentaire, rv.patient_id,
                    CONCAT(p.prenom, ' ', p.nom) as nom_patient
             FROM rendez_vous rv
             JOIN patient p ON rv.patient_id = p.id
@@ -474,8 +576,12 @@ public class RendezVousController implements Initializable {
 
                 LocalDate date = LocalDate.parse(dateStr);
                 LocalTime heure = LocalTime.parse(heureStr);
+                
+                String motif = resultSet.getString("motif");
+                String commentaire = resultSet.getString("commentaire");
+                int patientId = resultSet.getInt("patient_id");
 
-                RendezVous rdv = new RendezVous(id, nomPatient, date, heure);
+                RendezVous rdv = new RendezVous(id, nomPatient, date, heure, motif, commentaire, patientId);
                 rendezVousList.add(rdv);
             }
             tableRendezVous.setItems(rendezVousList);
@@ -686,6 +792,12 @@ public class RendezVousController implements Initializable {
     private void updateDeleteButtonState() {
         boolean hasSelectedItems = rendezVousList.stream().anyMatch(RendezVous::isSelected);
         btnSupprimer.setDisable(!hasSelectedItems);
+        
+        if (hasSelectedItems) {
+            btnSupprimer.setStyle("-fx-background-color: red; -fx-text-fill: white; -fx-background-radius: 5px; -fx-border-radius: 5px;");
+        } else {
+            btnSupprimer.setStyle("-fx-background-color: #F8F8F8; -fx-border-color: #CCCCCC; -fx-background-radius: 5px; -fx-border-radius: 5px;");
+        }
     }
     
     // ---- Manipulation des données ----
@@ -711,6 +823,9 @@ public class RendezVousController implements Initializable {
         comboPatientModif.setValue(rdv.getNomPatient());
         datePickerRendezVousModif.setValue(rdv.getDate());
         inputHeureModif.setText(rdv.getHeure().format(timeFormatter));
+        inputMotifModif.setText(rdv.getMotif());
+        textAreaCommentaireModif.setText(rdv.getCommentaire());
+        
         
         rendezVousListView.setVisible(false);
         planifierRendezVousView.setVisible(false);
@@ -731,10 +846,5 @@ public class RendezVousController implements Initializable {
         
         AlertMessage.showInfoAlert("Succès", "Modification réussie", 
                                "Le rendez-vous a été modifié avec succès.");
-    }
-    
-    private void exporterRendezVous() {
-        AlertMessage.showInfoAlert("Information", "Exportation", 
-                               "La fonctionnalité d'exportation sera implémentée prochainement.");
     }
 }

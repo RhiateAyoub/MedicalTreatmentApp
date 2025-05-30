@@ -27,8 +27,10 @@ public class RendezVous {
     private int id;
     private String nomPatient;  // Nom du patient associé au rendez-vous
     private LocalDate date;     // Date du rendez-vous
-    private String type;        // Type de rendez-vous (ex: consultation, suivi, urgence)
     private LocalTime heure;    // Heure du rendez-vous
+    private String motif;
+    private String commentaire;
+    private int patientId;
     
     // --- Propriétés observables
     private BooleanProperty selected = new SimpleBooleanProperty(false);
@@ -38,18 +40,31 @@ public class RendezVous {
     // ============================================================
     
     // --- Constructeur pour AcceuilController (sans id, heure)
-    public RendezVous(String nomPatient, LocalDate date, String type) {
+    public RendezVous(String nomPatient, LocalDate date, LocalTime heure) {
         this.nomPatient = nomPatient;
         this.date = date;
-        this.type = type;
+        this.heure = heure;
     }
     
-    // --- Constructeur pour RendezVousController (sans type)
-    public RendezVous(int id, String nomPatient, LocalDate date, LocalTime heure) {
+    // --- Constructeur pour RendezVousController (sans patientId)
+    public RendezVous(int id, String nomPatient, LocalDate date, LocalTime heure, String motif, String commentaire) {
         this.id = id;
         this.nomPatient = nomPatient;
         this.date = date;
         this.heure = heure;
+        this.motif = motif;
+        this.commentaire = commentaire;
+    }
+    
+    // --- Constructeur pour RendezVousController
+    public RendezVous(int id, String nomPatient, LocalDate date, LocalTime heure, String motif, String commentaire, int patientId) {
+        this.id = id;
+        this.nomPatient = nomPatient;
+        this.date = date;
+        this.heure = heure;
+        this.motif = motif;
+        this.commentaire = commentaire;
+        this.patientId = patientId;
     }
     
     // ============================================================
@@ -65,11 +80,17 @@ public class RendezVous {
     public LocalDate getDate() { return date; }
     public void setDate(LocalDate date) { this.date = date; }
     
-    public String getType() { return type; }
-    public void setType(String type) { this.type = type; }
-    
     public LocalTime getHeure() { return heure; }
     public void setHeure(LocalTime heure) { this.heure = heure; }
+    
+    public String getMotif() { return motif; }
+    public void setMotif(String motif) { this.motif = motif; }
+    
+    public String getCommentaire() { return commentaire; }
+    public void setCommentaire(String commentaire) { this.commentaire = commentaire; }
+    
+    public int getPatientId() { return patientId; }
+    public void setPatientId(int patientId) { this.patientId = patientId; }
     
     // ============================================================
     // ============= GESTION DE L'ÉTAT DE SÉLECTION ===============

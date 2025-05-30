@@ -52,7 +52,6 @@ public class AideController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         // Initialisation des liens
         emailLink.setOnAction(event -> handleEmailLink());
-        websiteLink.setOnAction(event -> handleWebsiteLink());
     }
     
     // =============================================================================
@@ -109,16 +108,6 @@ public class AideController implements Initializable {
         } catch (IOException | URISyntaxException e) {
             e.printStackTrace();
             AlertMessage.showInfoAlert("Information", "Problème d'ouverture du client mail", "Impossible d'ouvrir votre client mail. Veuillez contacter support@nomdappli.com manuellement.");
-        }
-    }
-
-    @FXML
-    private void handleWebsiteLink() {
-        try {
-            Desktop.getDesktop().browse(new URI("http://www.nomdappli.com"));
-        } catch (IOException | URISyntaxException e) {
-            e.printStackTrace();
-            AlertMessage.showInfoAlert("Information", "Problème d'ouverture du site web", "Impossible d'ouvrir le site web. Veuillez visiter www.nomdappli.com manuellement.");
         }
     }
 }

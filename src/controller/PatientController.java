@@ -747,6 +747,12 @@ public class PatientController {
         }
 
         anyPatientSelected.set(atLeastOneSelected);
+        
+        if (atLeastOneSelected) {
+            btnSupprimerPatients.setStyle("-fx-background-color: red; -fx-text-fill: white; -fx-background-radius: 5px; -fx-border-radius: 5px;");
+        } else {
+            btnSupprimerPatients.setStyle("-fx-background-color: #F8F8F8; -fx-border-color: #CCCCCC; -fx-background-radius: 5px; -fx-border-radius: 5px;");
+        }
     }
 
     // ============================================================

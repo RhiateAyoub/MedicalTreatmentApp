@@ -18,9 +18,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
+import model.Utilisateur;
 import utils.AlertMessage;
 import utils.Database;
 import utils.SceneManager;
+import utils.SessionManager;
 
 /**
  * Contrôleur pour la gestion de l'authentification dans l'application MediConnect.
@@ -80,15 +82,23 @@ public class LoginController {
             return;
         }
 
-        
+        // Charger les données de l'utilisateur
         String loginSQL = "SELECT * FROM utilisateur WHERE nom_utilisateur = ? AND mot_de_passe = ?";
         try (Connection connect = Database.connectDB();) {
             prepare = connect.prepareStatement(loginSQL);
             prepare.setString(1, username);
-            prepare.setString(2, password); // ⚠️ En production : utilisez un mot de passe haché ici
+            prepare.setString(2, password);
             result = prepare.executeQuery();
             if (result.next()) {
                 AlertMessage.showInfoAlert("Succès", "Connexion réussie", "Vous êtes connecté avec succès !");
+                Utilisateur utilisateurConnecte = new Utilisateur();
+                utilisateurConnecte.setNomUtilisateur(result.getString("nom_utilisateur"));
+                utilisateurConnecte.setDerniereConnexion(java.time.LocalDateTime.now());
+                utilisateurConnecte.setRole(result.getString("role"));
+
+                SessionManager.setUtilisateurActuel(utilisateurConnecte);
+
+
                 SceneManager.switchScene(loginButton, "/view/AcceuilView.fxml", "MediConnect - Acceuil", 1500, 750);
                 System.out.println("Navigation vers la vue d'acceuil");
             } else {

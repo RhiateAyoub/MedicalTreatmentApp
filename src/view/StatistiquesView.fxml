@@ -3,8 +3,6 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.MenuButton?>
-<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
@@ -127,22 +125,6 @@
                     </padding>
                     <Label style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Statistiques" />
                     <Region HBox.hgrow="ALWAYS" />
-                    <MenuButton text="...">
-                        <items>
-                            <MenuItem text="Option 1" />
-                            <MenuItem text="Option 2" />
-                        </items>
-                        <HBox.margin>
-                            <Insets right="10.0" />
-                        </HBox.margin>
-                    </MenuButton>
-                    <Button fx:id="btnExporter" style="-fx-background-color: #252525; -fx-text-fill: white;" styleClass="btn-exporter" text="Exporter">
-                        <graphic>
-                            <ImageView fitHeight="16" fitWidth="16" preserveRatio="true">
-                                <Image url="@../resources/icons/Upload.png" />
-                            </ImageView>
-                        </graphic>
-                    </Button>
             </HBox>
             
             <!-- Contenu des statistiques -->

@@ -2,6 +2,7 @@ package utils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.Statement;
 
 /**
  * Classe utilitaire pour gérer la connexion à la base de données
@@ -22,6 +23,12 @@ public class Database {
         try {
             String url = "jdbc:sqlite:src/utils/MedicalTreatmentApp_DB.db"; // chemin relatif vers le fichier .db
             conn = DriverManager.getConnection(url);
+            
+            try ( // Activer le support des clés étrangères (pour ON DELETE CASCADE)
+                    Statement stmt = conn.createStatement()) {
+                stmt.execute("PRAGMA foreign_keys = ON;");
+            }
+            
         } catch (Exception e) {
             e.printStackTrace();
         }

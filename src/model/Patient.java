@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package model;
+import java.time.LocalDate;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
@@ -23,7 +24,7 @@ public class Patient {
     private int id;
     private String nom;
     private String prenom;
-    private String dateNaissance;
+    private LocalDate dateNaissance;
     private String sexe;
     private String numTelephone;
     private String numSecuriteSociale;
@@ -37,7 +38,7 @@ public class Patient {
     // ====================== CONSTRUCTEURS ========================
     // ============================================================
 
-    public Patient(int id, String nom, String prenom, String dateNaissance, String sexe, String numTelephone, String numSecuriteSociale, String dateCreation) {
+    public Patient(int id, String nom, String prenom, LocalDate dateNaissance, String sexe, String numTelephone, String numSecuriteSociale, String dateCreation) {
         this.id = id;
         this.nom = nom;
         this.prenom = prenom;
@@ -48,7 +49,7 @@ public class Patient {
         this.dateCreation = dateCreation;
     }
 
-    public Patient(String nom, String prenom, String dateNaissance, String sexe, String numTelephone, String numSecuriteSociale) {
+    public Patient(String nom, String prenom, LocalDate dateNaissance, String sexe, String numTelephone, String numSecuriteSociale) {
         this.nom = nom;
         this.prenom = prenom;
         this.dateNaissance = dateNaissance;
@@ -70,8 +71,8 @@ public class Patient {
     public String getPrenom() { return prenom; }
     public void setPrenom(String prenom) { this.prenom = prenom; }
 
-    public String getDateNaissance() { return dateNaissance; }
-    public void setDateNaissance(String dateNaissance) { this.dateNaissance = dateNaissance; }
+    public LocalDate getDateNaissance() { return dateNaissance; }
+    public void setDateNaissance(LocalDate dateNaissance) { this.dateNaissance = dateNaissance; }
 
     public String getSexe() { return sexe; }
     public void setSexe(String sexe) { this.sexe = sexe; }

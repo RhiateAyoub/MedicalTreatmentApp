@@ -31,9 +31,11 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 
 import java.io.File;
+import java.time.LocalDate;
 
 import java.util.ArrayList;
 import java.util.List;
+import javafx.scene.control.DatePicker;
 
 import model.Patient;
 import utils.CSVExporter;
@@ -93,7 +95,7 @@ public class PatientController {
     @FXML private TextField inputPrenom;
     @FXML private TextField inputSecuriteSociale;
     @FXML private TextField inputTelephone;
-    @FXML private TextField inputDateNaissance;
+    @FXML private DatePicker inputDateNaissance;
     @FXML private RadioButton radioHomme;
     @FXML private RadioButton radioFemme;
 
@@ -102,7 +104,7 @@ public class PatientController {
     @FXML private TextField editPrenom;
     @FXML private TextField editSecuriteSociale;
     @FXML private TextField editTelephone;
-    @FXML private TextField editDateNaissance;
+    @FXML private DatePicker editDateNaissance;
     @FXML private RadioButton editRadioHomme;
     @FXML private RadioButton editRadioFemme;
 
@@ -215,7 +217,7 @@ public class PatientController {
                 String.valueOf(patient.getId()),
                 patient.getNom(),
                 patient.getPrenom(),
-                patient.getDateNaissance(),
+                patient.getDateNaissance().toString(),
                 patient.getSexe(),
                 patient.getNumTelephone(),
                 patient.getNumSecuriteSociale(),
@@ -329,14 +331,19 @@ public class PatientController {
 
         String nom = inputNom.getText().trim();
         String prenom = inputPrenom.getText().trim();
-        String dateNaissance = inputDateNaissance.getText().trim();
+        LocalDate dateNaissance = inputDateNaissance.getValue();
         String tele = inputTelephone.getText().trim();
         String secu = inputSecuriteSociale.getText().trim();
         String sexe = radioHomme.isSelected() ? "Homme" : (radioFemme.isSelected() ? "Femme" : "");
 
         Patient newPatient = new Patient(nom, prenom, dateNaissance, sexe, tele, secu);
+        
+        // Sauvegarder en base de données
+        if(!ajouterPatientDansDB(newPatient)) {
+            return; // Sortir si la sauvegarde échoue
+        }
+        
         patients.add(newPatient);
-        ajouterPatientDansDB(newPatient);
 
         patientsListView.setVisible(true);
         patientsAddView.setVisible(false);
@@ -355,7 +362,7 @@ public class PatientController {
         patientsAddView.setVisible(false);
     }
 
-    private void ajouterPatientDansDB(Patient patient) {
+    private boolean ajouterPatientDansDB(Patient patient) {
 
         String checkSecuSQL = "SELECT * FROM patient WHERE numero_securite_sociale = ?";
         String insertSQL = "INSERT INTO patient (nom, prenom, date_naissance, sexe, numero_telephone, numero_securite_sociale, date_creation) VALUES (?, ?, ?, ?, ?, ?, datetime('now'))";
@@ -370,18 +377,18 @@ public class PatientController {
                 AlertMessage.showErrorAlert(
                         "Erreur",
                         "Patient déjà existant",
-                        patient.getNumSecuriteSociale() + " existe déjà !");
-                return;
+                        "Un patient avec NSS: " + patient.getNumSecuriteSociale() + " existe déjà !");
+                return false;
             }
 
             insertStmt.setString(1, patient.getNom());
             insertStmt.setString(2, patient.getPrenom());
-            insertStmt.setString(3, patient.getDateNaissance());
+            insertStmt.setString(3, patient.getDateNaissance().toString());
             insertStmt.setString(4, patient.getSexe());
             insertStmt.setString(5, patient.getNumTelephone());
             insertStmt.setString(6, patient.getNumSecuriteSociale());
 
-            insertStmt.executeUpdate();
+            int res = insertStmt.executeUpdate();
 
             // Récupérer l'ID généré
             try (ResultSet generatedKeys = insertStmt.getGeneratedKeys()) {
@@ -403,6 +410,8 @@ public class PatientController {
                     patient.setDateCreation(dateCreation);
                 }
             }
+            
+            return res > 0;
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -410,6 +419,7 @@ public class PatientController {
                     "Erreur",
                     "Erreur BDD : ",
                     e.getMessage());
+            return false;
         }
     }
 
@@ -424,7 +434,7 @@ public class PatientController {
 
         patientToEdit.setNom(editNom.getText().trim());
         patientToEdit.setPrenom(editPrenom.getText().trim());
-        patientToEdit.setDateNaissance(editDateNaissance.getText().trim());
+        patientToEdit.setDateNaissance(editDateNaissance.getValue());
         patientToEdit.setNumTelephone(editTelephone.getText().trim());
         patientToEdit.setNumSecuriteSociale(editSecuriteSociale.getText().trim());
         patientToEdit.setSexe(editRadioHomme.isSelected() ? "Homme" : (editRadioFemme.isSelected() ? "Femme" : ""));
@@ -457,7 +467,7 @@ public class PatientController {
 
             updateStmt.setString(1, patient.getNom());
             updateStmt.setString(2, patient.getPrenom());
-            updateStmt.setString(3, patient.getDateNaissance());
+            updateStmt.setString(3, patient.getDateNaissance().toString());
             updateStmt.setString(4, patient.getSexe());
             updateStmt.setString(5, patient.getNumTelephone());
             updateStmt.setString(6, patient.getNumSecuriteSociale());
@@ -492,7 +502,7 @@ public class PatientController {
                 int id = result.getInt("id");
                 String nom = result.getString("nom");
                 String prenom = result.getString("prenom");
-                String dateNaissance = result.getString("date_naissance");
+                LocalDate dateNaissance = LocalDate.parse(result.getString("date_naissance"));
                 String sexe = result.getString("sexe");
                 String numTelephone = result.getString("numero_telephone");
                 String numSecuriteSociale = result.getString("numero_securite_sociale");
@@ -655,7 +665,7 @@ public class PatientController {
         inputPrenom.clear();
         inputSecuriteSociale.clear();
         inputTelephone.clear();
-        inputDateNaissance.clear();
+        inputDateNaissance.setValue(LocalDate.now());
 
         radioHomme.setSelected(false);
         radioFemme.setSelected(false);
@@ -669,7 +679,7 @@ public class PatientController {
         editPrenom.setText(patient.getPrenom());
         editSecuriteSociale.setText(patient.getNumSecuriteSociale());
         editTelephone.setText(patient.getNumTelephone());
-        editDateNaissance.setText(patient.getDateNaissance());
+        editDateNaissance.setValue(patient.getDateNaissance());
 
         if ("Homme".equals(patient.getSexe())) {
             editRadioHomme.setSelected(true);
@@ -702,7 +712,7 @@ public class PatientController {
     }
 
     // ---- Validation des formulaires ----
-    private boolean validatePatientInputs(TextField nom, TextField prenom, TextField dateNaissance) {
+    private boolean validatePatientInputs(TextField nom, TextField prenom, DatePicker dateNaissance) {
         StringBuilder errorMessage = new StringBuilder();
 
         if (nom.getText().trim().isEmpty()) {
@@ -713,14 +723,8 @@ public class PatientController {
             errorMessage.append("- Le prénom est obligatoire\n");
         }
 
-        if (dateNaissance.getText().trim().isEmpty()) {
+        if (dateNaissance.getValue() == null) {
             errorMessage.append("- La date de naissance est obligatoire\n");
-        } else {
-            // Validation du format de date (AAAA-MM-JJ)
-            String datePattern = "^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$";
-            if (!dateNaissance.getText().trim().matches(datePattern)) {
-                errorMessage.append("- Format de date invalide (AAAA-MM-JJ)\n");
-            }
         }
 
         if (errorMessage.length() > 0) {

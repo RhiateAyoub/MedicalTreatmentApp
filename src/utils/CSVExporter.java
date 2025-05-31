@@ -1,21 +1,21 @@
 package utils;
 
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class CSVExporter {
 
     public static void exportToCSV(String filePath, List<String> headers, List<List<String>> rows) {
-        try (FileWriter writer = new FileWriter(filePath)) {
+        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filePath), StandardCharsets.UTF_8))) {
             // Write headers
-            writer.append(String.join(",", headers));
-            writer.append("\n");
+            writer.write(String.join(",", headers));
+            writer.newLine();
 
             // Write rows
             for (List<String> row : rows) {
-                writer.append(String.join(",", row));
-                writer.append("\n");
+                writer.write(String.join(",", row));
+                writer.newLine();
             }
 
             System.out.println("CSV export completed: " + filePath);

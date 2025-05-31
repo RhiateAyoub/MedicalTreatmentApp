@@ -268,7 +268,7 @@
                                   <TableColumn fx:id="colType" prefWidth="257.0" text="Heure" />
                                 </columns>
                                  <VBox.margin>
-                                    <Insets bottom="12.0" top="12.0" />
+                                    <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
                                  </VBox.margin>
                                  <columnResizePolicy>
                                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />

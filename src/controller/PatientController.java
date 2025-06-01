@@ -347,6 +347,7 @@ public class PatientController {
 
         patientsListView.setVisible(true);
         patientsAddView.setVisible(false);
+        tablePatients.refresh();
 
         AlertMessage.showInfoAlert(
                 "Succès",

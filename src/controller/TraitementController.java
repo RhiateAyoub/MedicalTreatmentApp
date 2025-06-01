@@ -371,6 +371,7 @@ public class TraitementController implements Initializable {
             
             traitementsList.add(nouveauTraitement);
             ajouterTraitementDansDB(nouveauTraitement);
+            tableTraitements.refresh();
             
             traitementsListView.setVisible(true);
             traitementsAddView.setVisible(false);

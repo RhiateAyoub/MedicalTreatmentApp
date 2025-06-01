@@ -390,7 +390,7 @@ public class TraitementController implements Initializable {
     
     private void ajouterTraitementDansDB(Traitement traitement) {
         String queryId = "SELECT id FROM patient WHERE nom = ? AND prenom = ?";
-        String insertSQL = "INSERT INTO traitement (nom, date_debut, date_fin, type, actif, description, patient_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String insertSQL = "INSERT INTO traitement (nom, posologie, date_debut, date_fin, type, actif, description, patient_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection connect = Database.connectDB();
              PreparedStatement stmt = connect.prepareStatement(queryId);
@@ -411,12 +411,13 @@ public class TraitementController implements Initializable {
             }
 
             insertStmt.setString(1, traitement.getNomPatient());
-            insertStmt.setString(2, traitement.getDateDebutFormatted());
-            insertStmt.setString(3, traitement.getDateFinFormatted());
-            insertStmt.setString(4, traitement.getType());
-            insertStmt.setBoolean(5, traitement.getStatut().equals("En cours"));
-            insertStmt.setString(6, traitement.getDescription());
-            insertStmt.setInt(7, patientId);
+            insertStmt.setString(2, "");
+            insertStmt.setString(3, traitement.getDateDebutFormatted());
+            insertStmt.setString(4, traitement.getDateFinFormatted());
+            insertStmt.setString(5, traitement.getType());
+            insertStmt.setBoolean(6, traitement.getStatut().equals("En cours"));
+            insertStmt.setString(7, traitement.getDescription());
+            insertStmt.setInt(8, patientId);
 
             insertStmt.executeUpdate();
             
@@ -768,9 +769,9 @@ public class TraitementController implements Initializable {
         anyTraitementSelected.set(atLeastOneSelected);
         
         if (atLeastOneSelected) {
-            btnSupprimerTraitements.setStyle("-fx-background-color: red; -fx-text-fill: white; -fx-background-radius: 5px; -fx-border-radius: 5px;");
+            btnSupprimerTraitements.setStyle("-fx-background-color: red; -fx-text-fill: white; -fx-background-radius: 8px; -fx-border-radius: 8px;");
         } else {
-            btnSupprimerTraitements.setStyle("-fx-background-color: #F8F8F8; -fx-border-color: #CCCCCC; -fx-background-radius: 5px; -fx-border-radius: 5px;");
+            btnSupprimerTraitements.setStyle("-fx-background-color: #F8F8F8; -fx-border-color: #CCCCCC; -fx-background-radius: 8px; -fx-border-radius: 8px; -fx-text-fill: #333333;");
         }
     }
 

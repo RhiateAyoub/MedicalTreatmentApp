@@ -7,12 +7,14 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.LoginController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" stylesheets="@../resources/css/GeneralStyle.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.LoginController">
    <left>
       <VBox prefWidth="260.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #E0E0E0; -fx-border-width: 0 1px 0 0;" BorderPane.alignment="CENTER">
          <children>
@@ -23,6 +25,13 @@
                <VBox.margin>
                   <Insets bottom="30.0" />
                </VBox.margin>
+               <graphic>
+                  <ImageView fitHeight="51.0" fitWidth="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../resources/icons/MCAppLogo60x51.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
             </Label>
             <Label text="Menu" textFill="#757575">
                <font>
@@ -142,7 +151,7 @@
                   <TextField fx:id="visiblePasswordField" managed="false" prefHeight="40.0" promptText="Entrez votre mot de passe" visible="false" />
 
                   <!-- Checkbox -->
-                  <CheckBox fx:id="ShowPasswordCheckbox" mnemonicParsing="false" onAction="#togglePasswordVisibility" prefHeight="32.0" prefWidth="149.0" text="Afficher le mot de passe">
+                  <CheckBox fx:id="ShowPasswordCheckbox" mnemonicParsing="false" onAction="#togglePasswordVisibility" prefHeight="32.0" prefWidth="170.0" styleClass="password-toggle-checkbox" text="Afficher le mot de passe">
                      <VBox.margin>
                         <Insets bottom="10.0" />
                      </VBox.margin>

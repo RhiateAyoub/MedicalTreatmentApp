@@ -8,6 +8,8 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -16,7 +18,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.RegisterController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" stylesheets="@../resources/css/GeneralStyle.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.RegisterController">
    <left>
       <VBox prefWidth="260.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #E0E0E0; -fx-border-width: 0 1px 0 0;" BorderPane.alignment="CENTER">
          <children>
@@ -27,6 +29,13 @@
                <VBox.margin>
                   <Insets bottom="30.0" />
                </VBox.margin>
+               <graphic>
+                  <ImageView fitHeight="51.0" fitWidth="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../resources/icons/MCAppLogo60x51.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
             </Label>
             <Label text="Menu" textFill="#757575">
                <font>
@@ -124,7 +133,7 @@
                         <Insets bottom="40.0" />
                      </VBox.margin>
                   </Label>
-                  <GridPane hgap="15.0" vgap="10.0">
+                  <GridPane hgap="15.0" prefHeight="271.0" prefWidth="438.0" vgap="10.0">
                     <columnConstraints>
                       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                     </columnConstraints>
@@ -195,14 +204,14 @@
                      </children>
                   </GridPane>
                   <!-- Ajout de CheckBox-->
-                  <CheckBox fx:id="showPasswordCheckBox" onAction="#togglePasswordVisibility" text="Afficher le mot de passe">
+                  <CheckBox fx:id="showPasswordCheckBox" onAction="#togglePasswordVisibility" styleClass="password-toggle-checkbox" text="Afficher le mot de passe">
                      <VBox.margin>
                         <Insets top="10.0" />
                      </VBox.margin>
                   </CheckBox>
 
 
-                  <Button fx:id="registerButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleRegisterClick" prefHeight="40.0" style="-fx-background-color: #333333; -fx-text-fill: white; -fx-background-radius: 5;" text="S'inscrire">
+                  <Button fx:id="registerButton" maxHeight="70.0" mnemonicParsing="false" onAction="#handleRegisterClick" prefHeight="40.0" prefWidth="438.0" style="-fx-background-color: #333333; -fx-text-fill: white; -fx-background-radius: 5;" text="S'inscrire">
                      <VBox.margin>
                         <Insets bottom="20.0" top="20.0" />
                      </VBox.margin>

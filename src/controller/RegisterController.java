@@ -62,7 +62,7 @@ public class RegisterController {
     // ==============================================================================================================================
     @FXML
     private void initialize() {
-        ObservableList<String> specialties = FXCollections.observableArrayList("Médecin", "Secrétaire", "Autre");
+        ObservableList<String> specialties = FXCollections.observableArrayList("Médecin", "Secrétaire");
         specialtyComboBox.setItems(specialties);
     }
     

@@ -156,19 +156,19 @@
                         <Insets bottom="10.0" />
                      </VBox.margin>
                   </CheckBox>
-                  <Button fx:id="loginButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleLoginClick" prefHeight="40.0" style="-fx-background-color: #333333; -fx-text-fill: white; -fx-background-radius: 5;" text="Se connecter">
+                  <Button fx:id="loginButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleLoginClick" prefHeight="40.0" styleClass="action-button" text="Se connecter">
                      <VBox.margin>
                         <Insets bottom="20.0" />
                      </VBox.margin>
                   </Button>
                   <HBox alignment="CENTER">
                      <children>
-                        <Label text="Don't have an account? ">
+                        <Label text="Vous n'avez pas de compte?">
                            <font>
                               <Font size="13.0" />
                            </font>
                         </Label>
-                        <Hyperlink fx:id="registerLink" onAction="#handleRegisterClick" text="Register">
+                        <Hyperlink fx:id="registerLink" onAction="#handleRegisterClick" text="S'inscrire">
                            <font>
                               <Font size="13.0" />
                            </font>

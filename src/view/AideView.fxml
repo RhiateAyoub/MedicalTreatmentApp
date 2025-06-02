@@ -153,7 +153,10 @@
                                     <Image url="@../resources/icons/Mail.png" />
                                 </ImageView>
                                 <Label style="-fx-font-weight: bold;" text="Email:" />
-                                <Hyperlink fx:id="emailLink" onAction="#handleEmailLink" text="ayoubrhiate5@gmail.com" />
+                                <Hyperlink fx:id="emailLink1" text="ayoubrhiate5@gmail.com" />
+                                <Hyperlink fx:id="emailLink2" text="jalouliabdelilah79@gmail.com" />
+                                <Hyperlink fx:id="emailLink3" text="souhail.moustaghit.ensao@ump.ac.ma" />
+                                <Hyperlink fx:id="emailLink4" text="moad.lemrani.23@ump.ac.ma" />
                             </HBox>
                         </VBox>
                     </VBox>

@@ -45,6 +45,7 @@ public class RegisterController {
     
     
     @FXML private TextField visiblePasswordField;
+    @FXML private TextField visibleConfirmPasswordField;
     @FXML private CheckBox showPasswordCheckBox;
 
 
@@ -179,25 +180,34 @@ public class RegisterController {
         confirmPasswordField.clear();
         specialtyComboBox.setValue(null);
     }
+    
     @FXML
-private void togglePasswordVisibility() {
-    boolean show = showPasswordCheckBox.isSelected();
+    private void togglePasswordVisibility() {
+        boolean show = showPasswordCheckBox.isSelected();
 
-    if (show) {
-        visiblePasswordField.setText(passwordField.getText());
-        visiblePasswordField.setVisible(true);
-        visiblePasswordField.setManaged(true);
-        passwordField.setVisible(false);
-        passwordField.setManaged(false);
-    } else {
-        passwordField.setText(visiblePasswordField.getText());
-        passwordField.setVisible(true);
-        passwordField.setManaged(true);
-        visiblePasswordField.setVisible(false);
-        visiblePasswordField.setManaged(false);
+        if (show) {
+            visiblePasswordField.setText(passwordField.getText());
+            visiblePasswordField.setVisible(true);
+            visiblePasswordField.setManaged(true);
+            passwordField.setVisible(false);
+            passwordField.setManaged(false);
+            visibleConfirmPasswordField.setText(confirmPasswordField.getText());
+            visibleConfirmPasswordField.setVisible(true);
+            visibleConfirmPasswordField.setManaged(true);
+            confirmPasswordField.setVisible(false);
+            confirmPasswordField.setManaged(false);
+        } else {
+            passwordField.setText(visiblePasswordField.getText());
+            passwordField.setVisible(true);
+            passwordField.setManaged(true);
+            visiblePasswordField.setVisible(false);
+            visiblePasswordField.setManaged(false);
+            confirmPasswordField.setText(visibleConfirmPasswordField.getText());
+            confirmPasswordField.setVisible(true);
+            confirmPasswordField.setManaged(true);
+            visibleConfirmPasswordField.setVisible(false);
+            visibleConfirmPasswordField.setManaged(false);
+        }
     }
-}
 
 }
-//visible Passworld
-

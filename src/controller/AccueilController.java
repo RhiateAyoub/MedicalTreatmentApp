@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package controller;
 
 import javafx.collections.FXCollections;
@@ -46,19 +42,12 @@ public class AccueilController implements Initializable {
     // ============================================================
 
     // --- Navigation
-    @FXML private Button btnAccueil;
     @FXML private Button btnPatients;
     @FXML private Button btnTraitements;
     @FXML private Button btnRendezVous;
     @FXML private Button btnStatistiques;
     @FXML private Button btnParametres;
     @FXML private Button btnAide;
-
-    // --- Actions principales
-    @FXML private Button btnExporter;
-    @FXML private Button btnAjouterPatient;
-    @FXML private Button btnAjouterTraitement;
-    @FXML private Button btnPlanifierRendezVous;
 
     // --- Affichage des données
     @FXML private Label lblTotalPatients;

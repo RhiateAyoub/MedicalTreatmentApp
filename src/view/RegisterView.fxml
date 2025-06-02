@@ -183,6 +183,7 @@
                                  </VBox.margin>
                               </Label>
                               <PasswordField fx:id="confirmPasswordField" prefHeight="40.0" promptText="Confirm your password" />
+                              <TextField fx:id="visibleConfirmPasswordField" managed="false" prefHeight="40.0" promptText="Confirm your password" visible="false" />
                            </children>
                            <GridPane.margin>
                               <Insets top="20.0" />
@@ -211,19 +212,19 @@
                   </CheckBox>
 
 
-                  <Button fx:id="registerButton" maxHeight="70.0" mnemonicParsing="false" onAction="#handleRegisterClick" prefHeight="40.0" prefWidth="438.0" style="-fx-background-color: #333333; -fx-text-fill: white; -fx-background-radius: 5;" text="S'inscrire">
+                  <Button fx:id="registerButton" maxHeight="70.0" mnemonicParsing="false" onAction="#handleRegisterClick" prefHeight="40.0" prefWidth="438.0" styleClass="action-button" text="S'inscrire">
                      <VBox.margin>
                         <Insets bottom="20.0" top="20.0" />
                      </VBox.margin>
                   </Button>
                   <HBox alignment="CENTER">
                      <children>
-                        <Label text="Already have an account? ">
+                        <Label text="Vous avez déjà un compte?">
                            <font>
                               <Font size="13.0" />
                            </font>
                         </Label>
-                        <Hyperlink fx:id="loginLink" onAction="#handleLoginClick" text="Login">
+                        <Hyperlink fx:id="loginLink" onAction="#handleLoginClick" text="Se connecter">
                            <font>
                               <Font size="13.0" />
                            </font>

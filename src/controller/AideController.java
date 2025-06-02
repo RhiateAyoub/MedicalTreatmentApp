@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package controller;
 
 import javafx.event.ActionEvent;
@@ -39,11 +35,12 @@ public class AideController implements Initializable {
     @FXML private Button btnRendezVous;
     @FXML private Button btnStatistiques;
     @FXML private Button btnParametres;
-    @FXML private Button btnAide;
     
     // --- Actions principales
-    @FXML private Hyperlink emailLink;
-    @FXML private Hyperlink websiteLink;
+    @FXML private Hyperlink emailLink1;
+    @FXML private Hyperlink emailLink2;
+    @FXML private Hyperlink emailLink3;
+    @FXML private Hyperlink emailLink4;
 
     // ==============================================================================================================================
     // ================= MÉTHODE D’INITIALISATION (Méthode appelée automatiquement après le chargement du fichier FXML) =============
@@ -51,7 +48,10 @@ public class AideController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // Initialisation des liens
-        emailLink.setOnAction(event -> handleEmailLink());
+        emailLink1.setOnAction(e -> handleEmailLink(emailLink1.getText()));
+        emailLink2.setOnAction(e -> handleEmailLink(emailLink2.getText()));
+        emailLink3.setOnAction(e -> handleEmailLink(emailLink3.getText()));
+        emailLink4.setOnAction(e -> handleEmailLink(emailLink4.getText()));
     }
     
     // =============================================================================
@@ -102,12 +102,15 @@ public class AideController implements Initializable {
     // ================= ACTIONS SUR LA VUE PRINCIPALE ============
     // ============================================================
     @FXML
-    private void handleEmailLink() {
+    private void handleEmailLink(String email) {
         try {
-            Desktop.getDesktop().mail(new URI("mailto:support@nomdappli.com"));
+            Desktop.getDesktop().mail(new URI("mailto:" + email));
         } catch (IOException | URISyntaxException e) {
             e.printStackTrace();
-            AlertMessage.showInfoAlert("Information", "Problème d'ouverture du client mail", "Impossible d'ouvrir votre client mail. Veuillez contacter support@nomdappli.com manuellement.");
+            AlertMessage.showInfoAlert("Information",
+                    "Problème d'ouverture du client mail",
+                    "Impossible d'ouvrir votre client mail. Veuillez contacter support@nomdappli.com manuellement."
+            );
         }
     }
 }

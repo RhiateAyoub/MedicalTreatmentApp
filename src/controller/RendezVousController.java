@@ -19,7 +19,6 @@ import utils.Database;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
@@ -46,7 +45,6 @@ import javafx.stage.FileChooser;
 import javafx.util.Callback;
 
 import model.RendezVous;
-import model.Traitement;
 import utils.AlertMessage;
 import utils.CSVExporter;
 import utils.SceneManager;
@@ -68,14 +66,12 @@ public class RendezVousController implements Initializable {
     @FXML private Button btnAccueil;
     @FXML private Button btnPatients;
     @FXML private Button btnTraitements;
-    @FXML private Button btnRendezVous;
     @FXML private Button btnStatistiques;
     @FXML private Button btnParametres;
     @FXML private Button btnAide;
     
     // --- Actions principales
     @FXML private Button btnExporter;
-    @FXML private Button btnPlanifier;
     @FXML private Button btnSupprimer;
     
     // --- Organisation des vues
@@ -104,8 +100,6 @@ public class RendezVousController implements Initializable {
     @FXML private TextField inputHeure;
     @FXML private TextField inputMotif;
     @FXML private TextArea textAreaCommentaire;
-    @FXML private Button btnConfirmerPlanification;
-    @FXML private Button btnAnnulerPlanification;
     
     // --- Formulaire de modification
     @FXML private Label labelRendezVousId;
@@ -114,8 +108,6 @@ public class RendezVousController implements Initializable {
     @FXML private TextField inputHeureModif;
     @FXML private TextField inputMotifModif;
     @FXML private TextArea textAreaCommentaireModif;
-    @FXML private Button btnConfirmerModification;
-    @FXML private Button btnAnnulerModification;
     
     // ============================================================
     // ============== ATTRIBUTS ET STRUCTURES DE DONNÉES ==========

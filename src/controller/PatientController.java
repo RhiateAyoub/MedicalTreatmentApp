@@ -58,7 +58,6 @@ public class PatientController {
 
     // --- Navigation
     @FXML private Button btnAccueil;
-    @FXML private Button btnPatients;
     @FXML private Button btnTraitements;
     @FXML private Button btnRendezVous;
     @FXML private Button btnStatistiques;
@@ -67,7 +66,6 @@ public class PatientController {
 
     // --- Actions principales
     @FXML private Button btnExporter;
-    @FXML private Button btnAjouterPatient;
     @FXML private Button btnSupprimerPatients;
 
     // --- Organisation des vues
@@ -325,7 +323,7 @@ public class PatientController {
 
     @FXML
     private void handleConfirmerAjoutClick() {
-        if (!validatePatientInputs(inputNom, inputPrenom, inputDateNaissance)) {
+        if (!validatePatientInputs(inputNom, inputPrenom, inputDateNaissance, inputSecuriteSociale, inputTelephone)) {
             return;
         }
 
@@ -347,7 +345,6 @@ public class PatientController {
 
         patientsListView.setVisible(true);
         patientsAddView.setVisible(false);
-        tablePatients.refresh();
 
         AlertMessage.showInfoAlert(
                 "Succès",
@@ -429,7 +426,7 @@ public class PatientController {
     // =======================================================================
     @FXML
     private void handleConfirmerModificationClick() {
-        if (!validatePatientInputs(editNom, editPrenom, editDateNaissance)) {
+        if (!validatePatientInputs(inputNom, inputPrenom, inputDateNaissance, inputSecuriteSociale, inputTelephone)) {
             return;
         }
 
@@ -713,9 +710,10 @@ public class PatientController {
     }
 
     // ---- Validation des formulaires ----
-    private boolean validatePatientInputs(TextField nom, TextField prenom, DatePicker dateNaissance) {
+    private boolean validatePatientInputs(TextField nom, TextField prenom, DatePicker dateNaissance, TextField numeroSecuriteSocialeField, TextField numeroTelephoneField) {
         StringBuilder errorMessage = new StringBuilder();
 
+        // Vérification des champs obligatoires
         if (nom.getText().trim().isEmpty()) {
             errorMessage.append("- Le nom est obligatoire\n");
         }
@@ -728,11 +726,28 @@ public class PatientController {
             errorMessage.append("- La date de naissance est obligatoire\n");
         }
 
+        // Vérification du numéro de sécurité sociale (15 chiffres)
+        String nss = numeroSecuriteSocialeField.getText().trim();
+        if (nss.isEmpty()) {
+            errorMessage.append("- Le numéro de sécurité sociale est obligatoire\n");
+        } else if (!nss.matches("[0-9]{15}")) {
+            errorMessage.append("- Numéro de sécurité sociale invalide (15 chiffres requis)\n");
+        }
+
+        // Vérification du numéro de téléphone (10 chiffres)
+        String tel = numeroTelephoneField.getText().trim();
+        if (tel.isEmpty()) {
+            errorMessage.append("- Le numéro de téléphone est obligatoire\n");
+        } else if (!tel.matches("[0-9]{10}")) {
+            errorMessage.append("- Numéro de téléphone invalide (10 chiffres requis)\n");
+        }
+
+        // Affichage d'une alerte si des erreurs sont détectées
         if (errorMessage.length() > 0) {
             AlertMessage.showErrorAlert(
-                    "Erreur",
-                    "Validation échouée",
-                    "Veuillez corriger les erreurs suivantes :\n" + errorMessage
+                "Erreur",
+                "Validation échouée",
+                "Veuillez corriger les erreurs suivantes :\n" + errorMessage.toString()
             );
             return false;
         }

@@ -49,10 +49,6 @@ public class StatistiquesController implements Initializable {
     @FXML private Button btnParametres;
     @FXML private Button btnAide;
     
-    // --- Actions principales
-    @FXML private Button btnExporter;
-    @FXML private Button btnOptions;
-    
     // --- Affichage des données
     @FXML private Label lblTotalPatients;
     @FXML private Label lblTraitementsEnCours;
@@ -94,7 +90,7 @@ public class StatistiquesController implements Initializable {
         
         // Configuration du graphique avec les données mensuelles
         initBarChart();
-        //css de barchart
+        //CSS de barchart
         barChartTraitementsMois.getStylesheets().add("data:text/css,.default-color0.chart-bar { -fx-bar-fill: black; }");
         loadTraitementsFrequents();
     }

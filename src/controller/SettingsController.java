@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package controller;
 
 import java.net.URL;
@@ -11,12 +7,10 @@ import java.sql.ResultSet;
 import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 
-import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.control.Alert.AlertType;
 
 import model.Utilisateur;
 import utils.AlertMessage;
@@ -44,17 +38,12 @@ public class SettingsController implements Initializable {
     @FXML private Button btnTraitements;
     @FXML private Button btnRendezVous;
     @FXML private Button btnStatistiques;
-    @FXML private Button btnParametres;
     @FXML private Button btnAide;
     
     // --- Actions principales
-    @FXML private Button btnExporter;
     @FXML private Button btnDeconnexion;
-    @FXML private Button btnChangerMotDePasse;
     
     // --- Configuration
-    @FXML private ComboBox<String> comboTheme;
-    @FXML private ComboBox<String> comboLangue;
     @FXML private Label lblNomUtilisateur;
     @FXML private Label lblDerniereConnexion;
     @FXML private PasswordField ancienMotDePasseField;

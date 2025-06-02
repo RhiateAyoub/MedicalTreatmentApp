@@ -16,9 +16,7 @@ import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 
@@ -30,12 +28,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import javafx.stage.FileChooser;
-import model.Patient;
 
 import model.Traitement;
 import utils.AlertMessage;
@@ -59,20 +55,14 @@ public class TraitementController implements Initializable {
     // --- Navigation
     @FXML private Button btnAccueil;
     @FXML private Button btnPatients;
-    @FXML private Button btnTraitements;
     @FXML private Button btnRendezVous;
     @FXML private Button btnStatistiques;
     @FXML private Button btnParametres;
     @FXML private Button btnAide;
     
     // --- Actions principales
-    @FXML private Button btnAjouterTraitement;
     @FXML private Button btnSupprimerTraitements;
     @FXML private Button btnExporter;
-    
-    // --- Conteneurs principaux
-    @FXML private BorderPane mainBorderPane;
-    @FXML private StackPane contentArea;
     
     // --- Organisation des vues
     @FXML private VBox traitementsListView;
@@ -101,8 +91,6 @@ public class TraitementController implements Initializable {
     @FXML private DatePicker inputDateDebut;
     @FXML private DatePicker inputDateFin;
     @FXML private TextArea inputDescription;
-    @FXML private Button btnConfirmerAjout;
-    @FXML private Button btnAnnulerAjout;
     
     // --- Formulaire d'édition
     @FXML private Label labelTraitementId;
@@ -113,8 +101,6 @@ public class TraitementController implements Initializable {
     @FXML private DatePicker datePickerFinModif;
     @FXML private CheckBox checkBoxActifModif;
     @FXML private TextArea textAreaObservationsModif;
-    @FXML private Button btnConfirmerModification;
-    @FXML private Button btnAnnulerModification;
 
     // ============================================================
     // ============== ATTRIBUTS ET STRUCTURES DE DONNÉES ==========
@@ -133,9 +119,6 @@ public class TraitementController implements Initializable {
     
     // --- List contenant les patients disponibles
     private ObservableList<String> patientsList = FXCollections.observableArrayList();
-    
-    // --- Formatage des dates
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     // ==============================================================================================================================
     // ================= MÉTHODE D'INITIALISATION (Méthode appelée automatiquement après le chargement du fichier FXML) =============

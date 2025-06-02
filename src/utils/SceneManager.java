@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package utils;
 
 import javafx.fxml.FXMLLoader;
@@ -9,6 +5,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.Screen;
 
 import java.io.IOException;
 
@@ -39,6 +36,23 @@ public class SceneManager {
             // Récupérer la fenêtre actuelle à partir du nœud déclencheur
             Stage stage = (Stage) triggerNode.getScene().getWindow();
             
+            // Récupérer les dimensions de l'écran
+            double screenWidth = Screen.getPrimary().getVisualBounds().getWidth();
+            double screenHeight = Screen.getPrimary().getVisualBounds().getHeight();
+            
+            // Sauvegarder l'état actuel de maximisation de la fenêtre
+            boolean isMaximized = stage.isMaximized();
+            
+           // Définir la taille initiale (1500x750) si la fenêtre n'est pas maximisée
+            if (!isMaximized) {
+                width = 1500;  // Set fixed width
+                height = 750;  // Set fixed height
+            } else {
+                // Si la fenêtre est maximisée, définir la taille de la fenêtre à la taille de l'écran
+                width = screenWidth;
+                height = screenHeight;
+            }
+            
             // Créer et configurer la nouvelle scène
             Scene newScene = new Scene(root, width, height);
             
@@ -46,7 +60,15 @@ public class SceneManager {
             stage.setScene(newScene);
             stage.setTitle(title);
             
+            // Restaurer l'état de maximisation après avoir changé de scène
+            if (isMaximized) {
+                stage.setMaximized(true);
+            }
+            
+            // S'assurer que la taille de la fenêtre est correctement ajustée
+            stage.sizeToScene();
             stage.show();
+            
         } catch (IOException e) {
             e.printStackTrace();
             AlertMessage.showErrorAlert("Erreur", "Erreur de navigation", "Impossible de charger la vue : " + e.getMessage());
